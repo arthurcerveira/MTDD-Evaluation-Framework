@@ -11,6 +11,33 @@ from guacamol.utils.chemistry import smiles_to_rdkit_mol, parse_molecular_formul
 from guacamol.utils.math import arithmetic_mean, geometric_mean
 
 
+class TargetResponseScoringFunction(ScoringFunctionBasedOnRdkitMol):
+    """
+    Scoring function that measures the response of a molecule against a target protein.
+    - Requires a pre-trained QSAR model with a predict method
+    - Requires a preprocessor method that converts a SMILES string (e.g. Morgan fingerprint)
+    """
+
+    def __init__(self, target, model, preprocess_smiles, score_modifier: ScoreModifier = None) -> None:
+        """
+        Args:
+            target: target protein
+            model: pre-trained QSAR model
+            preprocess_method: method to preprocess a SMILES string
+            score_modifier: score modifier
+        """
+        super().__init__(score_modifier=score_modifier)
+
+        self.target = target
+        self.model = model
+        self.preprocess_smiles = preprocess_smiles
+
+    def score_mol(self, mol: Chem.Mol) -> float:
+        smiles = Chem.MolToSmiles(mol)
+        preprocessed_smiles = self.preprocess_smiles(smiles)
+        return self.model.predict(preprocessed_smiles)
+
+
 class RdkitScoringFunction(ScoringFunctionBasedOnRdkitMol):
     """
     Scoring function wrapping RDKit descriptors.
