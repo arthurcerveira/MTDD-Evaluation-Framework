@@ -1,22 +1,29 @@
 import pickle
+import os
+
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+MODEL_DIR = os.path.join(CURRENT_DIR, '..', 'models')
 
 def load_pickled_model(model_path):
+    if model_path is None:
+        return None
+
     with open(model_path, 'rb') as f:
         model = pickle.load(f)
     
     return model
 
 # Preprocessor
-MORGAN_PREPROCESSOR = load_pickled_model('models/morgan_preprocessor.pkl')
+MORGAN_PREPROCESSOR = load_pickled_model(os.path.join(MODEL_DIR, 'Morgan.pkl'))
 
 # Protein targets 
-ACHE_MODEL = load_pickled_model('models/ache_model.pkl')
-APP_MODEL = load_pickled_model('models/app_model.pkl')
-D2R_MODEL = load_pickled_model('models/d2r_model.pkl')
-_5HT1A_MODEL = load_pickled_model('models/5ht1a_model.pkl')
-NTRK1_MODEL = load_pickled_model('models/nrtk1_model.pkl')
-NTRK3_MODEL = load_pickled_model('models/nrtk3_model.pkl')
-ROS1_MODEL = load_pickled_model('models/ros1_model.pkl')
+ACHE_MODEL = load_pickled_model(None)
+APP_MODEL = load_pickled_model(None)
+D2R_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'D2R.pkl'))
+_5HT1A_MODEL = load_pickled_model(os.path.join(MODEL_DIR, '_5HT1A.pkl'))
+NTRK1_MODEL = load_pickled_model(None)
+NTRK3_MODEL = load_pickled_model(None)
+ROS1_MODEL = load_pickled_model(None)
 
 # Other criterion
-BBB_MODEL = load_pickled_model('models/bbb_model.pkl')
+BBB_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'BBB.pkl'))

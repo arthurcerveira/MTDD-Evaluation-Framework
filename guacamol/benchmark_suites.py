@@ -10,6 +10,12 @@ from guacamol.standard_benchmarks import hard_cobimetinib, similarity, logP_benc
     kldiv_benchmark, perindopril_rings, amlodipine_rings, sitagliptin_replacement, zaleplon_with_other_formula, valsartan_smarts, \
     median_tadalafil_sildenafil, decoration_hop, scaffold_hop, ranolazine_mpo, pioglitazone_mpo
 
+from guacamol.multitarget_benchmarks import (
+    alzheimer_mpo_benchmark,
+    schizophrenia_mpo_benchmark,
+    lung_cancer_mpo_benchmark
+)
+
 
 def goal_directed_benchmark_suite(version_name: str) -> List[GoalDirectedBenchmark]:
     if version_name == 'v1':
@@ -18,6 +24,9 @@ def goal_directed_benchmark_suite(version_name: str) -> List[GoalDirectedBenchma
         return goal_directed_suite_v2()
     if version_name == 'trivial':
         return goal_directed_suite_trivial()
+
+    if version_name == 'multitarget':
+        return goal_directed_suite_multitarget()
 
     raise Exception(f'Goal-directed benchmark suite "{version_name}" does not exist.')
 
@@ -41,6 +50,14 @@ def distribution_learning_benchmark_suite(chembl_file_path: str,
         return distribution_learning_suite_v1(chembl_file_path=chembl_file_path, number_samples=number_samples)
 
     raise Exception(f'Distribution-learning benchmark suite "{version_name}" does not exist.')
+
+
+def goal_directed_suite_multitarget() -> List[GoalDirectedBenchmark]:
+    return [
+        # alzheimer_mpo_benchmark(),
+        schizophrenia_mpo_benchmark(),
+        # lung_cancer_mpo_benchmark()
+    ]
 
 
 def goal_directed_suite_v1() -> List[GoalDirectedBenchmark]:
