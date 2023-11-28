@@ -1,4 +1,10 @@
 venv/
+models/*.pkl
+data/*.csv
+data/*.txt
+!data/ROS1-ChEMBL.csv
+guacamol/data/guacamol_v1_all.smiles
+
 *pyc
 .idea
 .cache

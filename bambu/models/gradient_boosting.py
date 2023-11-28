@@ -12,8 +12,10 @@ class GradientBoostingEstimator(SKLearnEstimator):
        
         search_space = {
             "loss": {
-                "domain": tune.choice(["deviance", "exponential"]),
-                "init_value": "deviance"
+                # "domain": tune.choice(["deviance", "exponential"]),
+                # "init_value": "deviance"
+                "domain": tune.choice(['log_loss', 'exponential']),
+                "init_value": 'log_loss'
             },
             "learning_rate": {
                 "domain": tune.uniform(lower=1e-5, upper=1 - 1e-5),
@@ -44,7 +46,8 @@ class GradientBoostingEstimator(SKLearnEstimator):
                 "init_value": 1e-5
             },
             "max_features": {
-                "domain": tune.choice([None, "auto", "sqrt", "log2"]),
+                # "domain": tune.choice([None, "auto", "sqrt", "log2"]),
+                "domain": tune.choice([None, "sqrt", "log2"]),
                 "init_value": None                
             },
             "max_leaf_nodes": {

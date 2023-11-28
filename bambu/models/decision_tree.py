@@ -36,7 +36,8 @@ class DecisionTreeEstimator(SKLearnEstimator):
                 "init_value": 1e-5
             },
             "max_features": {
-                "domain": tune.choice([None, "auto", "sqrt", "log2"]),
+                # "domain": tune.choice([None, "auto", "sqrt", "log2"]),
+                "domain": tune.choice([None, "sqrt", "log2"]),
                 "init_value": None                
             },
             "max_leaf_nodes": {

@@ -92,23 +92,31 @@ def preprocess(input_file, output_file, output_preprocessor_file, feature_type, 
             raise Exception(f"The path '{mol2vec_model_path}' is not a valid mol2vec model")
         preprocessor = Mol2VecPreprocessor(pretrained_model=mol2vec_model_path)
     
+
+    features = list()
+
     for r, row in tqdm(df_input.iterrows(), total=df_input.shape[0]):
     
         mol = Chem.inchi.MolFromInchi(row.InChI)
 
-        try:
-            mol_features = preprocessor.compute_features(mol)
-            mol_features['activity'] = 1 if row.activity == "active" else 0
-        except:
-            continue
+        if mol is None:
+            print(row.InChI)
+
+        mol_features = preprocessor.compute_features(mol)
+        if row.activity == "active":
+            mol_features['activity'] = 1
+        else:
+            mol_features['activity'] = 0
         
-        df_features = pd.DataFrame([mol_features], columns=[*preprocessor.features, 'activity'])
-        df_features.to_csv(
-            output_file, 
-            index=False, 
-            mode='w' if r == 0 else 'a',
-            header=True if r == 0 else False
-        )
+        features.append(mol_features)
+    
+    df_features = pd.DataFrame(features, columns=[*preprocessor.features, 'activity'])
+    df_features.to_csv(
+        output_file, 
+        index=False, 
+        mode='w',
+        header=True
+    )
 
     with open(output_preprocessor_file, 'wb') as preprocessor_writer:
         preprocessor_writer.write(pickle.dumps(preprocessor, protocol=pickle.HIGHEST_PROTOCOL))
