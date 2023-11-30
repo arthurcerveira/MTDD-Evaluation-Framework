@@ -31,15 +31,15 @@ def alzheimer_mpo_benchmark() -> GoalDirectedBenchmark:
     - Pass through blood-brain barrier (BBB)
     """
     ache_scorer = TargetResponseScoringFunction(
-        target='AChE', model=ACHE_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='AChE', model=ACHE_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     app_scorer = TargetResponseScoringFunction(
-        target='APP', model=APP_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='APP', model=APP_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     bbb_scorer = TargetResponseScoringFunction(
-        target='BBB', model=BBB_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     mean_scorer = GeometricMeanScoringFunction(
@@ -65,15 +65,15 @@ def schizophrenia_mpo_benchmark() -> GoalDirectedBenchmark:
     - Pass through blood-brain barrier (BBB)
     """
     d2_scorer = TargetResponseScoringFunction(
-        target='D2', model=D2R_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='D2', model=D2R_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     _5ht2a_scorer = TargetResponseScoringFunction(
-        target='5-HT2A', model=_5HT1A_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='5-HT2A', model=_5HT1A_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     bbb_scorer = TargetResponseScoringFunction(
-        target='BBB', model=BBB_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     mean_scorer = GeometricMeanScoringFunction(
@@ -98,15 +98,15 @@ def lung_cancer_mpo_benchmark() -> GoalDirectedBenchmark:
     - Proto-oncogene tyrosine-protein kinase ROS (ROS1)
     """
     ntrk3_scorer = TargetResponseScoringFunction(
-        target='NTRK3', model=NTRK3_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='NTRK3', model=NTRK3_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     ntrk1_scorer = TargetResponseScoringFunction(
-        target='NTRK1', model=NTRK1_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='NTRK1', model=NTRK1_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     ros1_scorer = TargetResponseScoringFunction(
-        target='ROS1', model=ROS1_MODEL, preprocess_smiles=MORGAN_PREPROCESSOR
+        target='ROS1', model=ROS1_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     mean_scorer = GeometricMeanScoringFunction(

@@ -54,9 +54,9 @@ def distribution_learning_benchmark_suite(chembl_file_path: str,
 
 def goal_directed_suite_multitarget() -> List[GoalDirectedBenchmark]:
     return [
-        # alzheimer_mpo_benchmark(),
+        alzheimer_mpo_benchmark(),
         schizophrenia_mpo_benchmark(),
-        # lung_cancer_mpo_benchmark()
+        lung_cancer_mpo_benchmark()
     ]
 
 

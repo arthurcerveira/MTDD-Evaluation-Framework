@@ -2,6 +2,7 @@ from typing import Callable, List
 
 from rdkit import Chem
 from rdkit.DataStructs.cDataStructs import TanimotoSimilarity
+import pandas as pd
 
 from guacamol.utils.descriptors import mol_weight, logP, num_H_donors, tpsa, num_atoms, AtomCounter
 from guacamol.utils.fingerprints import get_fingerprint
@@ -18,7 +19,7 @@ class TargetResponseScoringFunction(ScoringFunctionBasedOnRdkitMol):
     - Requires a preprocessor method that converts a SMILES string (e.g. Morgan fingerprint)
     """
 
-    def __init__(self, target, model, preprocess_smiles, score_modifier: ScoreModifier = None) -> None:
+    def __init__(self, target, model, preprocessor, score_modifier: ScoreModifier = None) -> None:
         """
         Args:
             target: target protein
@@ -30,12 +31,35 @@ class TargetResponseScoringFunction(ScoringFunctionBasedOnRdkitMol):
 
         self.target = target
         self.model = model
-        self.preprocess_smiles = preprocess_smiles
+        self.preprocessor = preprocessor
 
     def score_mol(self, mol: Chem.Mol) -> float:
-        smiles = Chem.MolToSmiles(mol)
-        preprocessed_smiles = self.preprocess_smiles(smiles)
-        return self.model.predict(preprocessed_smiles)
+        _, predicted_activity_proba = self.model_predict_wrapper(mol)
+
+        return predicted_activity_proba
+
+    def model_predict_wrapper(self, mol: Chem.Mol):
+        mol_features_computed = True
+
+        try:
+            mol_features = self.preprocessor.compute_features(mol)
+        except:
+            mol_features_computed = False
+
+        if mol_features_computed:
+            df_features  = pd.DataFrame([mol_features], columns=self.preprocessor.features)
+            predicted_activity = self.model.predict(df_features)[0]
+            predicted_activity_proba = self.model.predict_proba(df_features)
+
+            if predicted_activity_proba.shape[1] == 2:
+                predicted_activity_proba = predicted_activity_proba[0][1]
+            else:
+                predicted_activity_proba = predicted_activity_proba[0]
+        else:
+            predicted_activity = None
+            predicted_activity_proba = None
+
+        return predicted_activity, predicted_activity_proba
 
 
 class RdkitScoringFunction(ScoringFunctionBasedOnRdkitMol):

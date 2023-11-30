@@ -2,12 +2,13 @@ from pprint import pprint
 import json
 import os
 
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
 from bambu.download import download_pubchem_assay_data
 from bambu.preprocess import preprocess
 from bambu.train import train
 from bambu.validate import validate
-import pandas as pd
-from sklearn.model_selection import train_test_split
 
 
 BIOASSAY_IDS = {
@@ -17,7 +18,8 @@ BIOASSAY_IDS = {
     "D2R": 485344,
     "_5HT1A": 624169,
     "NTRK3": None,
-    "NTRK1": None
+    "NTRK1": None,
+    "ROS1": None,
 }
 
 validation_report = dict()

@@ -17,13 +17,13 @@ def load_pickled_model(model_path):
 MORGAN_PREPROCESSOR = load_pickled_model(os.path.join(MODEL_DIR, 'Morgan.pkl'))
 
 # Protein targets 
-ACHE_MODEL = load_pickled_model(None)
-APP_MODEL = load_pickled_model(None)
+ACHE_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'AChE.pkl'))
+APP_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'APP.pkl'))
 D2R_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'D2R.pkl'))
 _5HT1A_MODEL = load_pickled_model(os.path.join(MODEL_DIR, '_5HT1A.pkl'))
-NTRK1_MODEL = load_pickled_model(None)
-NTRK3_MODEL = load_pickled_model(None)
-ROS1_MODEL = load_pickled_model(None)
+NTRK1_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'NTRK1.pkl'))
+NTRK3_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'NTRK3.pkl'))
+ROS1_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'ROS1.pkl'))
 
 # Other criterion
 BBB_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'BBB.pkl'))
