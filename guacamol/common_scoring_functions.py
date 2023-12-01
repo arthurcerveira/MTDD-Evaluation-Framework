@@ -1,6 +1,7 @@
 from typing import Callable, List
 
 from rdkit import Chem
+from rdkit.Chem import Lipinski
 from rdkit.DataStructs.cDataStructs import TanimotoSimilarity
 import pandas as pd
 
@@ -59,6 +60,36 @@ class TargetResponseScoringFunction(BatchScoringFunction):
         return predicted_activity_proba
 
 
+class SyntheticAccessibilityScoringFunction(ScoringFunctionBasedOnRdkitMol):
+    """
+    Scoring function that measures the synthetic accessibility of a molecule.
+    https://jcheminf.biomedcentral.com/articles/10.1186/s13321-023-00678-z
+    Accessibility scorers:
+    - SAscore
+    - SYBA
+    - SCScore
+    - RAscore
+    """
+
+    def __init__(self, accessibility_scorer, min_score=1, max_score=10, score_modifier: ScoreModifier = None) -> None:
+        """
+        Args:
+            score_modifier: score modifier
+        """
+        super().__init__(score_modifier=score_modifier)
+        self.accessibility_scorer = accessibility_scorer
+        self.min_score = min_score
+        self.max_score = max_score
+
+    def score_mol(self, mol: Chem.Mol) -> float:
+        accessibility = self.accessibility_scorer(mol)
+
+        # Normalize accessibility score to [0,1]
+        normalized_accessibility = (accessibility - self.min_score) / (self.max_score - self.min_score)
+
+        return normalized_accessibility
+
+
 class RdkitScoringFunction(ScoringFunctionBasedOnRdkitMol):
     """
     Scoring function wrapping RDKit descriptors.
@@ -103,10 +134,49 @@ class TanimotoScoringFunction(ScoringFunctionBasedOnRdkitMol):
         fp = get_fingerprint(mol, self.fp_type)
         return TanimotoSimilarity(fp, self.ref_fp)
 
+class RuleOfFiveScoringFunction(ScoringFunctionBasedOnRdkitMol):
+    """
+    Lipinski's rule of five scoring function describes the drug-likeness of a chemical compound
+    This scoring function considers the following criteria:
+    - no more than 5 hydrogen bond donors
+    - no more than 10 hydrogen bond acceptors
+    - a molecular weight under 500 daltons
+    - an octanol-water partition coefficient log P not greater than 5
+    """
+
+    def __init__(self, score_modifier: ScoreModifier = None) -> None:
+        """
+        Args:
+            score_modifier: score modifier
+        """
+        super().__init__(score_modifier=score_modifier)
+
+    def score_mol(self, mol: Chem.Mol) -> float:
+        # Calculate the number of violations of the rule of five
+        violations = 0
+
+        if Lipinski.NumHDonors(mol) > 5:
+            violations += 1
+        if Lipinski.NumHAcceptors(mol) > 10:
+            violations += 1
+        if mol_weight(mol) > 500:
+            violations += 1
+        if logP(mol) > 5:
+            violations += 1
+
+        # An orally active drug-like compound shouldn't have more than one violation of the RO5
+        if violations <= 1:  # 0 or 1 violations
+            return 1.0
+
+        ro5_score = 1 - violations / 4
+
+        return ro5_score
+
 
 class CNS_MPO_ScoringFunction(ScoringFunctionBasedOnRdkitMol):
     """
     CNS MPO scoring function
+    https://pubs.acs.org/doi/10.1021/jm501535r
     """
 
     def __init__(self, max_logP=5.0, maxMW=360, min_tpsa=40, max_tpsa=90, max_hbd=0) -> None:

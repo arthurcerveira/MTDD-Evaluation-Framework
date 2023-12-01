@@ -1,12 +1,15 @@
 from rdkit import Chem
 
-from guacamol.common_scoring_functions import TargetResponseScoringFunction
 from guacamol.goal_directed_benchmark import GoalDirectedBenchmark
 from guacamol.goal_directed_score_contributions import uniform_specification
-# from guacamol.score_modifier import MinGaussianModifier, MaxGaussianModifier, ClippedScoreModifier, GaussianModifier
 from guacamol.scoring_function import GeometricMeanScoringFunction
-# from guacamol.utils.descriptors import num_rotatable_bonds, num_aromatic_rings, logP, qed, tpsa, bertz, mol_weight, \
-    # AtomCounter, num_rings
+
+from guacamol.common_scoring_functions import (
+    TargetResponseScoringFunction,
+    CNS_MPO_ScoringFunction,
+    SyntheticAccessibilityScoringFunction,
+    RuleOfFiveScoringFunction
+)
 
 from guacamol.models import (
     MORGAN_PREPROCESSOR,
@@ -20,6 +23,13 @@ from guacamol.models import (
     BBB_MODEL
 )
 
+# Import sascorer from RDKit contrib
+import os
+import sys
+sys.path.append(os.path.join(Chem.RDConfig.RDContribDir, 'SA_Score'))
+
+import sascorer
+
 
 def alzheimer_mpo_benchmark() -> GoalDirectedBenchmark:
     """
@@ -29,6 +39,8 @@ def alzheimer_mpo_benchmark() -> GoalDirectedBenchmark:
     - Amyloid-β peptide (APP)
     Other criteria:
     - Pass through blood-brain barrier (BBB)
+    - Physicochemical Properties for Optimal Brain Exposure
+    - Synthetical accessibility
     """
     ache_scorer = TargetResponseScoringFunction(
         target='AChE', model=ACHE_MODEL, preprocessor=MORGAN_PREPROCESSOR
@@ -42,8 +54,20 @@ def alzheimer_mpo_benchmark() -> GoalDirectedBenchmark:
         target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
-    mean_scorer = GeometricMeanScoringFunction(
+    mean_effectiveness = GeometricMeanScoringFunction(
         [ache_scorer, app_scorer, bbb_scorer]
+    )
+
+    # Physicochemical Properties for Optimal Brain Exposure
+    cnsm_mpo = CNS_MPO_ScoringFunction()
+
+    # Synthetical accessibility
+    synthetic_accessibility = SyntheticAccessibilityScoringFunction(
+        sascorer.calculateScore
+    )
+
+    mean_scorer = GeometricMeanScoringFunction(
+        [mean_effectiveness, cnsm_mpo, synthetic_accessibility]
     )
 
     specification = uniform_specification(1, 10, 100)
@@ -63,6 +87,8 @@ def schizophrenia_mpo_benchmark() -> GoalDirectedBenchmark:
     - 5-hydroxytryptamine receptor 2A (5-HT2A)
     Other criteria:
     - Pass through blood-brain barrier (BBB)
+    - Physicochemical Properties for Optimal Brain Exposure
+    - Synthetical accessibility
     """
     d2_scorer = TargetResponseScoringFunction(
         target='D2', model=D2R_MODEL, preprocessor=MORGAN_PREPROCESSOR
@@ -76,8 +102,20 @@ def schizophrenia_mpo_benchmark() -> GoalDirectedBenchmark:
         target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
-    mean_scorer = GeometricMeanScoringFunction(
+    mean_effectiveness = GeometricMeanScoringFunction(
         [d2_scorer, _5ht2a_scorer, bbb_scorer]
+    )
+
+    # Physicochemical Properties for Optimal Brain Exposure
+    cnsm_mpo = CNS_MPO_ScoringFunction()
+
+    # Synthetical accessibility
+    synthetic_accessibility = SyntheticAccessibilityScoringFunction(
+        sascorer.calculateScore
+    )
+
+    mean_scorer = GeometricMeanScoringFunction(
+        [mean_effectiveness, cnsm_mpo, synthetic_accessibility]
     )
 
     specification = uniform_specification(1, 10, 100)
@@ -96,6 +134,9 @@ def lung_cancer_mpo_benchmark() -> GoalDirectedBenchmark:
     - NT-3 growth factor receptor (NTRK3)
     - High affinity nerve growth factor receptor (NTRK1)
     - Proto-oncogene tyrosine-protein kinase ROS (ROS1)
+    Other criteria:
+    - Physicochemical Properties for oral bioavailability
+    - Synthetical accessibility
     """
     ntrk3_scorer = TargetResponseScoringFunction(
         target='NTRK3', model=NTRK3_MODEL, preprocessor=MORGAN_PREPROCESSOR
@@ -109,8 +150,20 @@ def lung_cancer_mpo_benchmark() -> GoalDirectedBenchmark:
         target='ROS1', model=ROS1_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
-    mean_scorer = GeometricMeanScoringFunction(
+    mean_effectiveness = GeometricMeanScoringFunction(
         [ntrk3_scorer, ntrk1_scorer, ros1_scorer]
+    )
+
+    # Physicochemical Properties for oral bioavailability
+    rule_of_five = RuleOfFiveScoringFunction()
+
+    # Synthetical accessibility
+    synthetic_accessibility = SyntheticAccessibilityScoringFunction(
+        sascorer.calculateScore
+    )
+
+    mean_scorer = GeometricMeanScoringFunction(
+        [mean_effectiveness, rule_of_five, synthetic_accessibility]
     )
 
     specification = uniform_specification(1, 10, 100)
