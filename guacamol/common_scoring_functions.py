@@ -7,12 +7,12 @@ import pandas as pd
 from guacamol.utils.descriptors import mol_weight, logP, num_H_donors, tpsa, num_atoms, AtomCounter
 from guacamol.utils.fingerprints import get_fingerprint
 from guacamol.score_modifier import ScoreModifier, MinGaussianModifier, MaxGaussianModifier, GaussianModifier
-from guacamol.scoring_function import ScoringFunctionBasedOnRdkitMol, MoleculewiseScoringFunction
+from guacamol.scoring_function import ScoringFunctionBasedOnRdkitMol, MoleculewiseScoringFunction, BatchScoringFunction
 from guacamol.utils.chemistry import smiles_to_rdkit_mol, parse_molecular_formula
 from guacamol.utils.math import arithmetic_mean, geometric_mean
 
 
-class TargetResponseScoringFunction(ScoringFunctionBasedOnRdkitMol):
+class TargetResponseScoringFunction(BatchScoringFunction):
     """
     Scoring function that measures the response of a molecule against a target protein.
     - Requires a pre-trained QSAR model with a predict method
@@ -33,33 +33,30 @@ class TargetResponseScoringFunction(ScoringFunctionBasedOnRdkitMol):
         self.model = model
         self.preprocessor = preprocessor
 
-    def score_mol(self, mol: Chem.Mol) -> float:
-        _, predicted_activity_proba = self.model_predict_wrapper(mol)
+    def raw_score_list(self, smiles_list: List[str]) -> List[float]:
+        mols = [smiles_to_rdkit_mol(smiles) for smiles in smiles_list]
+
+        predicted_activity_proba = self.model_predict_wrapper(mols)
 
         return predicted_activity_proba
 
-    def model_predict_wrapper(self, mol: Chem.Mol):
+    def model_predict_wrapper(self, mols: List[Chem.Mol]):
         mol_features_computed = True
 
         try:
-            mol_features = self.preprocessor.compute_features(mol)
+            mol_features = self.preprocessor.vectorized_compute_features(mols)
         except:
             mol_features_computed = False
 
+        predicted_activity_proba = None
+
         if mol_features_computed:
-            df_features  = pd.DataFrame([mol_features], columns=self.preprocessor.features)
-            predicted_activity = self.model.predict(df_features)[0]
+            df_features = pd.DataFrame(mol_features, columns=self.preprocessor.features)
+
             predicted_activity_proba = self.model.predict_proba(df_features)
+            predicted_activity_proba = predicted_activity_proba[:,1]
 
-            if predicted_activity_proba.shape[1] == 2:
-                predicted_activity_proba = predicted_activity_proba[0][1]
-            else:
-                predicted_activity_proba = predicted_activity_proba[0]
-        else:
-            predicted_activity = None
-            predicted_activity_proba = None
-
-        return predicted_activity, predicted_activity_proba
+        return predicted_activity_proba
 
 
 class RdkitScoringFunction(ScoringFunctionBasedOnRdkitMol):
