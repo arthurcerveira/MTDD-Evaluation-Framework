@@ -101,6 +101,15 @@ class GoalDirectedBenchmark:
         metadata["internal_similarity_histogram_density"] = int_simi_histogram[0].tolist(),
         metadata["internal_similarity_histogram_bins"] = int_simi_histogram[1].tolist(),
 
+        # Save individual scoring function scores in metadata
+        # Verify if objective has scoring_functions attribute
+        if hasattr(self.objective, 'scoring_functions'):
+            for i, scoring_function in enumerate(self.objective.scoring_functions):
+                class_name = scoring_function.__class__.__name__
+                score_function_key = f'scoring_function_{i}_{class_name}'
+
+                metadata[score_function_key] = scoring_function.score_list(unique_molecules)
+
         return GoalDirectedBenchmarkResult(benchmark_name=self.name,
                                            score=global_score,
                                            optimized_molecules=sorted_scored_molecules,
