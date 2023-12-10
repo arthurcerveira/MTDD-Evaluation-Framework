@@ -3,12 +3,14 @@ from rdkit import Chem
 from guacamol.goal_directed_benchmark import GoalDirectedBenchmark
 from guacamol.goal_directed_score_contributions import uniform_specification
 from guacamol.scoring_function import GeometricMeanScoringFunction
+from guacamol.utils.descriptors import qed
 
 from guacamol.common_scoring_functions import (
     TargetResponseScoringFunction,
     CNS_MPO_ScoringFunction,
     SyntheticAccessibilityScoringFunction,
-    RuleOfFiveScoringFunction
+    # RuleOfFiveScoringFunction,
+    RdkitScoringFunction
 )
 
 from guacamol.models import (
@@ -50,12 +52,12 @@ def alzheimer_mpo_benchmark() -> GoalDirectedBenchmark:
         target='APP', model=APP_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
-    bbb_scorer = TargetResponseScoringFunction(
-        target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
+    mean_effectiveness = GeometricMeanScoringFunction(
+        [ache_scorer, app_scorer]
     )
 
-    mean_effectiveness = GeometricMeanScoringFunction(
-        [ache_scorer, app_scorer, bbb_scorer]
+    bbb_scorer = TargetResponseScoringFunction(
+        target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     # Physicochemical Properties for Optimal Brain Exposure
@@ -67,7 +69,7 @@ def alzheimer_mpo_benchmark() -> GoalDirectedBenchmark:
     )
 
     mean_scorer = GeometricMeanScoringFunction(
-        [mean_effectiveness, cnsm_mpo, synthetic_accessibility]
+        [mean_effectiveness, bbb_scorer, cnsm_mpo, synthetic_accessibility]
     )
 
     specification = uniform_specification(1, 10, 100)
@@ -98,12 +100,12 @@ def schizophrenia_mpo_benchmark() -> GoalDirectedBenchmark:
         target='5-HT2A', model=_5HT1A_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
-    bbb_scorer = TargetResponseScoringFunction(
-        target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
+    mean_effectiveness = GeometricMeanScoringFunction(
+        [d2_scorer, _5ht2a_scorer]
     )
 
-    mean_effectiveness = GeometricMeanScoringFunction(
-        [d2_scorer, _5ht2a_scorer, bbb_scorer]
+    bbb_scorer = TargetResponseScoringFunction(
+        target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     # Physicochemical Properties for Optimal Brain Exposure
@@ -115,7 +117,7 @@ def schizophrenia_mpo_benchmark() -> GoalDirectedBenchmark:
     )
 
     mean_scorer = GeometricMeanScoringFunction(
-        [mean_effectiveness, cnsm_mpo, synthetic_accessibility]
+        [mean_effectiveness, bbb_scorer, cnsm_mpo, synthetic_accessibility]
     )
 
     specification = uniform_specification(1, 10, 100)
@@ -155,7 +157,8 @@ def lung_cancer_mpo_benchmark() -> GoalDirectedBenchmark:
     )
 
     # Physicochemical Properties for oral bioavailability
-    rule_of_five = RuleOfFiveScoringFunction()
+    # rule_of_five = RuleOfFiveScoringFunction()
+    qed_scorer = RdkitScoringFunction(descriptor=qed)
 
     # Synthetical accessibility
     synthetic_accessibility = SyntheticAccessibilityScoringFunction(
@@ -163,7 +166,7 @@ def lung_cancer_mpo_benchmark() -> GoalDirectedBenchmark:
     )
 
     mean_scorer = GeometricMeanScoringFunction(
-        [mean_effectiveness, rule_of_five, synthetic_accessibility]
+        [mean_effectiveness, qed_scorer, synthetic_accessibility]
     )
 
     specification = uniform_specification(1, 10, 100)

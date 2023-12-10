@@ -61,10 +61,12 @@ def _evaluate_goal_directed_benchmarks(goal_directed_molecule_generator: GoalDir
     results = []
     for i, benchmark in enumerate(benchmarks, 1):
         logger.info(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
+        print(f'Running benchmark {i}/{len(benchmarks)}: {benchmark.name}')
         result = benchmark.assess_model(goal_directed_molecule_generator)
         logger.info(f'Results for the benchmark "{result.benchmark_name}":')
-        logger.info(f'  Score: {result.score:.6f}')
+        print(f'  Score: {result.score:.6f}')
         logger.info(f'  Execution time: {str(datetime.timedelta(seconds=int(result.execution_time)))}')
+        print(f'  Execution time: {str(datetime.timedelta(seconds=int(result.execution_time)))}')
         logger.info(f'  Metadata: {result.metadata}')
         results.append(result)
 
