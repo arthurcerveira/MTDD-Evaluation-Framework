@@ -7,6 +7,7 @@ import os
 import random
 from time import time
 from typing import List, Optional
+from datetime import datetime
 
 import joblib
 import numpy as np
@@ -20,7 +21,7 @@ from guacamol.scoring_function import ScoringFunction
 from guacamol.utils.chemistry import canonicalize
 from guacamol.utils.helpers import setup_default_logger
 
-from graph_mcts.stats import Stats, get_stats_from_pickle, get_stats_from_smiles
+from baselines.graph_mcts.stats import Stats, get_stats_from_pickle, get_stats_from_smiles
 
 rdBase.DisableLog('rdApp.error')
 
@@ -335,6 +336,7 @@ class GB_MCTS_Generator(GoalDirectedGenerator):
         old_score = 0
 
         for generation in range(self.generations):
+            print(f"[{datetime.now():%H:%M:%S}] Generation {generation}")
 
             job = delayed(find_molecule)(scoring_function,
                                          self.init_mol,

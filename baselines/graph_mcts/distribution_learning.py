@@ -14,8 +14,8 @@ from guacamol.assess_distribution_learning import assess_distribution_learning
 from guacamol.distribution_matching_generator import DistributionMatchingGenerator
 from guacamol.utils.helpers import setup_default_logger
 
-from graph_mcts.goal_directed_generation import find_molecule, State, Node
-from graph_mcts.stats import Stats, get_stats_from_pickle, get_stats_from_smiles
+from .goal_directed_generation import find_molecule, State, Node
+from .stats import Stats, get_stats_from_pickle, get_stats_from_smiles
 
 rdBase.DisableLog('rdApp.error')
 

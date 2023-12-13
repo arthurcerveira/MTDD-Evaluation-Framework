@@ -16,7 +16,7 @@ from .rnn_utils import load_rnn_model
 class SmilesRnnDirectedGenerator(GoalDirectedGenerator):
     def __init__(self, pretrained_model_path: str, n_epochs=4, mols_to_sample=1028, keep_top=512,
                  optimize_n_epochs=2, max_len=100, optimize_batch_size=64, number_final_samples=1028,
-                 sample_final_model_only=False, random_start=False, smi_file=None, n_jobs=-1) -> None:
+                 sample_final_model_only=False, random_start=False, smi_file=None, n_jobs=-1, batch_size=500) -> None:
         self.pretrained_model_path = pretrained_model_path
         self.n_epochs = n_epochs
         self.mols_to_sample = mols_to_sample
@@ -30,14 +30,20 @@ class SmilesRnnDirectedGenerator(GoalDirectedGenerator):
         self.random_start = random_start
         self.smi_file = smi_file
         self.pool = joblib.Parallel(n_jobs=n_jobs)
+        self.batch_size = batch_size
 
     def load_smiles_from_file(self, smi_file):
         with open(smi_file) as f:
             return self.pool(delayed(canonicalize)(s.strip()) for s in f)
 
     def top_k(self, smiles, scoring_function, k):
-        joblist = (delayed(scoring_function.score)(s) for s in smiles)
+        # Score molecules in batches to improve performance
+        joblist = (delayed(scoring_function.score_list)(smiles[i:i + self.batch_size]) for i in
+                     range(0, len(smiles), self.batch_size))
+
         scores = self.pool(joblist)
+        scores = [score for sublist in scores for score in sublist]
+
         scored_smiles = list(zip(scores, smiles))
         scored_smiles = sorted(scored_smiles, key=lambda x: x[0], reverse=True)
         return [smile for score, smile in scored_smiles][:k]

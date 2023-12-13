@@ -2,6 +2,7 @@ import logging
 import time
 from functools import total_ordering
 from typing import List, Set
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -86,6 +87,7 @@ class SmilesRnnMoleculeGenerator:
                 seen.add(k.smiles)
 
         for epoch in range(1, 1 + n_epochs):
+            print(f"[{datetime.now():%H:%M:%S}] Starting epoch {epoch}")
 
             t0 = time.time()
             samples = self.sampler.sample(self.model, mols_to_sample, max_seq_len=self.max_len)
@@ -122,6 +124,7 @@ class SmilesRnnMoleculeGenerator:
             print_every = int(len(sub_train) / opt_batch_size)
 
             if optimize_n_epochs > 0:
+                print(f"[{datetime.now():%H:%M:%S}] Starting finetuning epoch {epoch}")
                 self.trainer.fit(train_set, valid_set,
                                  n_epochs=optimize_n_epochs,
                                  batch_size=opt_batch_size,
@@ -137,6 +140,7 @@ class SmilesRnnMoleculeGenerator:
 
             top4 = '\n'.join(f'\t{result.score:.3f}: {result.smiles}' for result in results[:4])
             logger.info(f'Top 4:\n{top4}')
+            print(f'Top 4:\n{top4}')
 
         return sorted(results, reverse=True)
 

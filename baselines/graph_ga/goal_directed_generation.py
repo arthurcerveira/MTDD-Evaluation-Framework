@@ -81,7 +81,7 @@ def sanitize(population_mol):
 
 class GB_GA_Generator(GoalDirectedGenerator):
 
-    def __init__(self, smi_file, population_size, offspring_size, generations, mutation_rate, n_jobs=-1, random_start=False, patience=5):
+    def __init__(self, smi_file, population_size, offspring_size, generations, mutation_rate, n_jobs=-1, random_start=False, patience=5, batch_size=500):
         self.pool = joblib.Parallel(n_jobs=n_jobs)
         self.smi_file = smi_file
         self.all_smiles = self.load_smiles_from_file(self.smi_file)
@@ -91,17 +91,24 @@ class GB_GA_Generator(GoalDirectedGenerator):
         self.mutation_rate = mutation_rate
         self.random_start = random_start
         self.patience = patience
+        self.batch_size = batch_size
 
     def load_smiles_from_file(self, smi_file):
         with open(smi_file) as f:
             return self.pool(delayed(canonicalize)(s.strip()) for s in f)
 
     def top_k(self, smiles, scoring_function, k):
-        joblist = (delayed(scoring_function.score)(s) for s in smiles)
+        # Score molecules in batches to improve performance
+        joblist = (delayed(scoring_function.score_list)(smiles[i:i + self.batch_size]) for i in
+                     range(0, len(smiles), self.batch_size))
+
         scores = self.pool(joblist)
+        scores = [score for sublist in scores for score in sublist]
+
         scored_smiles = list(zip(scores, smiles))
         scored_smiles = sorted(scored_smiles, key=lambda x: x[0], reverse=True)
         return [smile for score, smile in scored_smiles][:k]
+
 
     def generate_optimized_molecules(self, scoring_function: ScoringFunction, number_molecules: int,
                                      starting_population: Optional[List[str]] = None) -> List[str]:

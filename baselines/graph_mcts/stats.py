@@ -2,7 +2,7 @@ import os
 import pickle
 from collections import namedtuple
 
-from graph_mcts.analyze_dataset import StatsCalculator
+from .analyze_dataset import StatsCalculator
 
 Stats = namedtuple('Stats',
                    ['average_size', 'size_std_dev',
