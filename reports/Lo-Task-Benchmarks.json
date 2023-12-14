@@ -1,0 +1,66 @@
+{
+    "APP": {
+        "Accuracy": 0.68,
+        "ROC-AUC": 0.6889643463497453,
+        "F1": 0.7163120567375886,
+        "Precision": 0.7952755905511811,
+        "Recall": 0.6516129032258065,
+        "model": "RandomForestClassifier"
+    },
+    "AChE": {
+        "Accuracy": 0.6438356164383562,
+        "ROC-AUC": 0.6346153846153846,
+        "F1": 0.5666666666666668,
+        "Precision": 0.6538461538461539,
+        "Recall": 0.5,
+        "model": "RandomForestClassifier"
+    },
+    "BBB": {
+        "Accuracy": 0.66,
+        "ROC-AUC": 0.6527277406073083,
+        "F1": 0.7038327526132404,
+        "Precision": 0.6601307189542484,
+        "Recall": 0.753731343283582,
+        "model": "RandomForestClassifier"
+    },
+    "D2R": {
+        "Accuracy": 0.592,
+        "ROC-AUC": 0.5826103720840563,
+        "F1": 0.5,
+        "Precision": 0.5862068965517241,
+        "Recall": 0.4358974358974359,
+        "model": "RandomForestClassifier"
+    },
+    "_5HT1A": {
+        "Accuracy": 0.552,
+        "ROC-AUC": 0.5471153846153847,
+        "F1": 0.4766355140186916,
+        "Precision": 0.5425531914893617,
+        "Recall": 0.425,
+        "model": "ExtraTreesClassifier"
+    },
+    "NTRK3": {
+        "Accuracy": 0.6382978723404256,
+        "ROC-AUC": 0.734375,
+        "F1": 0.6382978723404256,
+        "Precision": 1.0,
+        "Recall": 0.46875,
+        "model": "ExtraTreesClassifier"
+    },
+    "NTRK1": {
+        "Accuracy": 0.8181818181818182,
+        "ROC-AUC": 0.5,
+        "F1": 0.9,
+        "Precision": 0.8181818181818182,
+        "Recall": 1.0,
+        "model": "RandomForestClassifier"
+    },
+    "ROS1": {
+        "Accuracy": 0.5885167464114832,
+        "ROC-AUC": 0.6104488731607375,
+        "F1": 0.5473684210526315,
+        "Precision": 0.7222222222222222,
+        "Recall": 0.4406779661016949,
+        "model": "RandomForestClassifier"
+    }
+}
