@@ -2,7 +2,11 @@ import os
 
 import pandas as pd
 from bambu.download import download_pubchem_assay_data
+import numpy as np
 from rdkit import Chem, RDLogger
+from rdkit.Chem import AllChem
+from rdkit import DataStructs
+from tqdm import tqdm
 
 # Disable RDKit warnings
 RDLogger.DisableLog('rdApp.*')
@@ -37,7 +41,7 @@ def get_zinc_dataset(output="data/ZINC.csv"):
     ).sample(frac=1.0)  # Shuffle the data
     
     # Convert smiles to InChI
-    inchis = smiles_to_inchi(zinc_complete["smiles"])
+    inchis = smiles_to_inchi(zinc_complete["smiles"], max_mols=1_000_000)
     zinc = pd.DataFrame({
         "InChI": inchis,
         # Zinc is used as a source of inactive examples
@@ -73,7 +77,31 @@ def get_nrtk3_assays(output="data/NTRK3.csv"):
         os.remove(f"data/{assay_id}.csv")
 
     # Enrich with inactive examples
-    nrtk3_inactive = pd.read_csv("data/ZINC.csv")
+    zinc = pd.read_csv("data/ZINC.csv")
+
+    nrtk3_inactive_lenght = len(nrtk3_active)
+    nrtk3_mols = [Chem.MolFromInchi(inchi) for inchi in nrtk3_active["InChI"]]
+    nrtk3_fps = [AllChem.GetMorganFingerprintAsBitVect(mol, 2, 1024) for mol in nrtk3_mols]
+
+    inactive_molecules = list()
+
+    for inchi in zinc["InChI"]:
+        mol = Chem.MolFromInchi(inchi)
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, 1024)
+
+        scores = np.array(DataStructs.BulkTanimotoSimilarity(fp, nrtk3_fps))
+
+        if ((scores >= 0.3) & (scores < 0.7)).any():
+            inactive_molecules.append(inchi)
+
+        if len(inactive_molecules) >= nrtk3_inactive_lenght:
+            break
+
+    nrtk3_inactive = pd.DataFrame({
+        "InChI": inactive_molecules,
+        "activity": "inactive"
+    })
+
     nrtk3_assays = pd.concat([nrtk3_active, nrtk3_inactive])
 
     nrtk3_assays = nrtk3_assays.drop_duplicates(
@@ -84,6 +112,7 @@ def get_nrtk3_assays(output="data/NTRK3.csv"):
 
 
 def get_nrtk1_assays(output="data/NTRK1.csv"):
+    print("Building NTRK1 dataset...")
     nrtk1_id = "1802770"
 
     download_pubchem_assay_data(
@@ -94,7 +123,38 @@ def get_nrtk1_assays(output="data/NTRK1.csv"):
 
     # Enrich with inactive examples
     nrtk1_active = pd.read_csv(f"data/{nrtk1_id}.csv")
-    nrtk1_inactive = pd.read_csv("data/ZINC.csv")
+    zinc = pd.read_csv("data/ZINC.csv").sample(frac=1.0)
+
+    nrtk1_inactive_lenght = len(nrtk1_active)
+    nrtk1_mols = [Chem.MolFromInchi(inchi) for inchi in nrtk1_active["InChI"]]
+    nrtk1_fps = [AllChem.GetMorganFingerprintAsBitVect(mol, 2, 1024) for mol in nrtk1_mols]
+
+    inactive_molecules = list()
+
+    # for inchi in zinc["InChI"]:
+    for inchi in tqdm(zinc["InChI"]):
+        try:
+            mol = Chem.MolFromInchi(inchi)
+            fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, 1024)
+        except:
+            continue
+
+        scores = np.array(DataStructs.BulkTanimotoSimilarity(fp, nrtk1_fps))
+
+        if ((scores >= 0.3) & (scores < 0.7)).any():
+            inactive_molecules.append(inchi)
+
+        if len(inactive_molecules) >= nrtk1_inactive_lenght:
+            print("Found enough inactive molecules")
+            break
+
+    nrtk1_inactive = pd.DataFrame({
+        "InChI": inactive_molecules,
+        "activity": "inactive"
+    })
+
+    print("Active molecules:", len(nrtk1_active))
+    print("Inactive molecules:", len(inactive_molecules))
 
     nrtk1_assays = pd.concat([nrtk1_active, nrtk1_inactive])
 
