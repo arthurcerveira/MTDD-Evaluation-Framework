@@ -5,6 +5,7 @@ data/*.txt
 !data/ROS1-ChEMBL.csv
 guacamol/data/guacamol_v1_*
 baselines/data/*
+baselines/*/pretrained_model/
 
 *pyc
 .idea

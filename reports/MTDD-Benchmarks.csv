@@ -1,0 +1,15 @@
+Benchmark,Metric,LSTM-PPO,LSTM-HC,SMILES GA,Graph GA,Best of dataset
+Alzheimer MPO,Score,0.69960,0.75210,0.78456,0.82479,0.66531
+Alzheimer MPO,Target Response,0.547 ± 0.077,0.565 ± 0.052,0.651 ± 0.041,0.733 ± 0.022,0.513 ± 0.080
+Alzheimer MPO,Blood-Brain Barrier,0.700 ± 0.090,0.770 ± 0.055,0.736 ± 0.044,0.830 ± 0.021,0.726 ± 0.098
+Alzheimer MPO,CNS MPO,0.954 ± 0.056,0.973 ± 0.032,0.970 ± 0.034,0.961 ± 0.024,0.948 ± 0.050
+Alzheimer MPO,Synthetic Accessibility,0.594 ± 0.088,0.670 ± 0.051,0.758 ± 0.016,0.761 ± 0.010,0.475 ± 0.092
+Schizophrenia MPO,Score,0.69794,0.76724,0.76288,0.82148,0.68150
+Schizophrenia MPO,Target Response,0.499 ± 0.047,0.547 ± 0.028,0.578 ± 0.035,0.704 ± 0.020,0.512 ± 0.044
+Schizophrenia MPO,Blood-Brain Barrier,0.728 ± 0.078,0.842 ± 0.036,0.790 ± 0.040,0.866 ± 0.021,0.741 ± 0.098
+Schizophrenia MPO,CNS MPO,0.939 ± 0.062,0.985 ± 0.020,0.928 ± 0.044,0.980 ± 0.021,0.935 ± 0.066
+Schizophrenia MPO,Synthetic Accessibility,0.626 ± 0.082,0.711 ± 0.030,0.740 ± 0.027,0.745 ± 0.014,0.509 ± 0.079
+Lung cancer MPO,Score,0.53437,0.58184,0.69529,0.76348,0.50271
+Lung cancer MPO,Target Response,0.395 ± 0.067,0.531 ± 0.055,0.571 ± 0.049,0.784 ± 0.041,0.376 ± 0.070
+Lung cancer MPO,QED Score,0.662 ± 0.130,0.655 ± 0.105,0.745 ± 0.066,0.736 ± 0.044,0.670 ± 0.148
+Lung cancer MPO,Synthetic Accessibility,0.474 ± 0.095,0.512 ± 0.058,0.719 ± 0.038,0.730 ± 0.018,0.442 ± 0.105
