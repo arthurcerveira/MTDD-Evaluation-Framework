@@ -22,11 +22,8 @@ BIOASSAY_IDS = {
     "ROS1": None,
 }
 
-validation_report = dict()
 
-
-for target, assay_id in BIOASSAY_IDS.items():
-    print(f"Processing {target}...")
+def qsar_pipeline(target, assay_id):
     assay_file = f"data/{target}.csv"
 
     if (assay_id is not None) and (not os.path.exists(assay_file)):
@@ -63,10 +60,18 @@ for target, assay_id in BIOASSAY_IDS.items():
         output=None,
     )
 
-    validation_report[target] = report["raw_scores"]
+    return report["raw_scores"]
 
-pprint(validation_report)
 
-# Save report
-with open(f"reports/QSAR-Models.json", "w") as f:
-    json.dump(validation_report, f, indent=4)
+if __name__ == "__main__":
+    validation_reports = dict()
+
+    for target, assay_id in BIOASSAY_IDS.items():
+        print(f"Processing {target}...")
+        validation_reports[target] = qsar_pipeline(target, assay_id)
+
+    pprint(validation_reports)
+
+    # Save report
+    with open(f"reports/QSAR-Models.json", "w") as f:
+        json.dump(validation_reports, f, indent=4)
