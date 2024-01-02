@@ -6,6 +6,8 @@ data/*.txt
 guacamol/data/guacamol_v1_*
 baselines/data/*
 baselines/*/pretrained_model/
+target-selection/full-database.xml
+target-selection/filtered-database.xml
 
 *pyc
 .idea
