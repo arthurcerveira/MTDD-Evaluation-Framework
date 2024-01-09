@@ -13,7 +13,8 @@ from guacamol.standard_benchmarks import hard_cobimetinib, similarity, logP_benc
 from guacamol.multitarget_benchmarks import (
     alzheimer_mpo_benchmark,
     schizophrenia_mpo_benchmark,
-    lung_cancer_mpo_benchmark
+    # lung_cancer_mpo_benchmark,
+    parkinson_mpo_benchmark
 )
 
 
@@ -56,7 +57,8 @@ def goal_directed_suite_multitarget() -> List[GoalDirectedBenchmark]:
     return [
         alzheimer_mpo_benchmark(),
         schizophrenia_mpo_benchmark(),
-        lung_cancer_mpo_benchmark()
+        # lung_cancer_mpo_benchmark(),
+        parkinson_mpo_benchmark()
     ]
 
 

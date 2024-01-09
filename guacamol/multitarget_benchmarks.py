@@ -22,7 +22,9 @@ from guacamol.models import (
     NTRK1_MODEL,
     NTRK3_MODEL,
     ROS1_MODEL,
-    BBB_MODEL
+    BBB_MODEL,
+    D3R_MODEL,
+    # D4R_MODEL
 )
 
 # Import sascorer from RDKit contrib
@@ -124,6 +126,57 @@ def schizophrenia_mpo_benchmark() -> GoalDirectedBenchmark:
 
     return GoalDirectedBenchmark(
         name='Schizophrenia MPO',
+        objective=mean_scorer,
+        contribution_specification=specification
+    )
+
+
+def parkinson_mpo_benchmark() -> GoalDirectedBenchmark:
+    """
+    Benchmark to evaluate multi-target molecules active against parkinson.
+    Targets considered:
+    - Dopamine D2, D3, and D4 receptor (D2R, D3R, D4R)
+    Other criteria:
+    - Pass through blood-brain barrier (BBB)
+    - Physicochemical Properties for Optimal Brain Exposure
+    - Synthetical accessibility
+    """
+    d2_scorer = TargetResponseScoringFunction(
+        target='D2', model=D2R_MODEL, preprocessor=MORGAN_PREPROCESSOR
+    )
+
+    d3_scorer = TargetResponseScoringFunction(
+        target='D3', model=D3R_MODEL, preprocessor=MORGAN_PREPROCESSOR
+    )
+
+    # d4_scorer = TargetResponseScoringFunction(
+    #     target='D4', model=D4R_MODEL, preprocessor=MORGAN_PREPROCESSOR
+    # )
+
+    mean_effectiveness = GeometricMeanScoringFunction(
+        [d2_scorer, d3_scorer]
+    )
+
+    bbb_scorer = TargetResponseScoringFunction(
+        target='BBB', model=BBB_MODEL, preprocessor=MORGAN_PREPROCESSOR
+    )
+
+    # Physicochemical Properties for Optimal Brain Exposure
+    cnsm_mpo = CNS_MPO_ScoringFunction()
+
+    # Synthetical accessibility
+    synthetic_accessibility = SyntheticAccessibilityScoringFunction(
+        sascorer.calculateScore
+    )
+
+    mean_scorer = GeometricMeanScoringFunction(
+        [mean_effectiveness, bbb_scorer, cnsm_mpo, synthetic_accessibility]
+    )
+
+    specification = uniform_specification(1, 10, 100)
+
+    return GoalDirectedBenchmark(
+        name='Parkinson MPO',
         objective=mean_scorer,
         contribution_specification=specification
     )
