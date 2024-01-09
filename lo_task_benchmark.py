@@ -7,7 +7,6 @@ from rdkit.Chem import AllChem
 import numpy as np
 import pandas as pd
 from imblearn.under_sampling import RandomUnderSampler
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 )
@@ -22,8 +21,9 @@ def load_bioassay_dataframe(target):
     df = df.dropna(subset=["InChI"])
     df = df.drop_duplicates(subset=["InChI"])
 
-    rus = RandomUnderSampler(random_state=42)
-    df, _ = rus.fit_resample(df, df["activity"])
+    if len(df) > 7_000:
+        rus = RandomUnderSampler(random_state=42)
+        df, _ = rus.fit_resample(df, df["activity"])
         
     inchi_to_smiles = lambda x: Chem.MolToSmiles(Chem.inchi.MolFromInchi(x))
 
@@ -136,12 +136,14 @@ if __name__ == "__main__":
         print("Test shape:", test.shape)
 
         if len(test) == 0 or train['activity'].nunique() < 2:
-            print("LO split failed, using random split...")
-            print("Test lenght:", len(test))
+            print("LO split failed")
+            continue
 
-            train, test = train_test_split(df, test_size=0.25, random_state=42)
-            train['cluster'] = 0
-            test['cluster'] = 1
+            # print("Test lenght:", len(test))
+
+            # train, test = train_test_split(df, test_size=0.25, random_state=42)
+            # train['cluster'] = 0
+            # test['cluster'] = 1
 
         print("Unique train classes:\n", train['activity'].value_counts())
         print("\nUnique test classes:\n", test['activity'].value_counts())

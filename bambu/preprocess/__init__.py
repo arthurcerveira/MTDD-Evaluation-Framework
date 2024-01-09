@@ -103,6 +103,8 @@ def preprocess(input_file, output_file, output_preprocessor_file, feature_type, 
             print(row.InChI)
 
         mol_features = preprocessor.compute_features(mol)
+        mol_features = {f'morgan_fp_bit_{i}': v for i, v in enumerate(mol_features)}
+
         if row.activity == "active":
             mol_features['activity'] = 1
         else:

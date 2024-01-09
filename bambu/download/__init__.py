@@ -35,7 +35,7 @@ def download_pubchem_assay_data(pubchem_assay_id, output, pubchem_InchI_chunksiz
     counter = 0
 
     if download_all:
-        activities = ['all']
+        activities = ['all', 'active', 'inactive']
     else:
         activities = ['active', 'inactive']
 

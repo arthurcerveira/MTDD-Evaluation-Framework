@@ -10,7 +10,8 @@ CUSTOM_ESTIMATORS = {
     'decision_tree': DecisionTreeEstimator,
     'svm': SvmEstimator,
     'logistic_regression': LogisticRegressionEstimator,
-    'gradient_boosting': GradientBoostingEstimator
+    'gradient_boosting': GradientBoostingEstimator,
+    'neural_network': NeuralNetworkEstimator,
 }
 
 AVAILABLE_ESTIMATORS = ['rf', 'extra_tree', *CUSTOM_ESTIMATORS.keys()]

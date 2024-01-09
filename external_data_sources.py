@@ -198,9 +198,42 @@ def get_ros1_dataset(output="data/ROS1.csv"):
     ros1.to_csv(output, index=False)
 
 
+def get_d4_dataset(output="data/D4R.csv"):
+    # Download assays from PubChem
+    d4_ids = [
+        "268991",
+        "625255",
+    ]
+
+    for assay_id in d4_ids:
+        download_pubchem_assay_data(
+            pubchem_assay_id=assay_id,
+            output=f"data/{assay_id}.csv",
+            pubchem_InchI_chunksize=100,
+            download_all=True
+        )
+
+    # Combine all the data into one file
+    d4 = pd.concat([
+        pd.read_csv(f"data/{assay_id}.csv") for assay_id in d4_ids
+    ])
+
+    d4 = (d4
+          .sort_values(by=["activity"], ascending=True)
+          .drop_duplicates(subset=["InChI"])
+          .replace("all", "inactive")
+    )
+    # Delete temporary files
+    for assay_id in d4_ids:
+        os.remove(f"data/{assay_id}.csv")
+
+    d4.to_csv(output, index=False)
+
+
 if __name__ == "__main__":
-    get_zinc_dataset()
-    get_nrtk3_assays()
-    get_nrtk1_assays()
-    get_bbb_dataset()
-    get_ros1_dataset()
+    # get_zinc_dataset()
+    # get_nrtk3_assays()
+    # get_nrtk1_assays()
+    # get_bbb_dataset()
+    # get_ros1_dataset()
+    get_d4_dataset()

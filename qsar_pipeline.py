@@ -17,9 +17,11 @@ BIOASSAY_IDS = {
     "BBB": None,
     "D2R": 485344,
     "_5HT1A": 624169,
-    "NTRK3": None,
-    "NTRK1": None,
-    "ROS1": None,
+    # "NTRK3": None,
+    # "NTRK1": None,
+    # "ROS1": None,
+    "D3R": 652048,
+    "D4R": None,
 }
 
 
@@ -37,7 +39,7 @@ def qsar_pipeline(target, assay_id):
         input_file=f"data/{target}.csv", 
         output_file=f"data/{target}-Preprocessed.csv",
         output_preprocessor_file="models/Morgan.pkl",
-        feature_type="morgan-64",
+        feature_type="morgan-1024",
         undersample=True,
     )
 
@@ -46,7 +48,7 @@ def qsar_pipeline(target, assay_id):
         output=f"models/{target}.pkl",
         estimators=['rf', 'extra_tree', 'decision_tree', 'svm', 
                     'logistic_regression', 'gradient_boosting'],
-        threads=7,
+        threads=15,
         max_iter=100,
     )
 
