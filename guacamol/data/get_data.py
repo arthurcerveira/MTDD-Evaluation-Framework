@@ -8,6 +8,11 @@ import pkgutil
 import platform
 from joblib import Parallel, delayed
 from typing import List, Iterable, Optional, Set
+import sys
+
+# Add the root of the project to the python path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
 
 from guacamol.utils.chemistry import canonicalize_list, filter_and_canonicalize, \
     initialise_neutralisation_reactions, split_charged_mol, get_fingerprints_from_smileslist
@@ -177,7 +182,8 @@ def main():
     chembl_file = os.path.join(args.destination, CHEMBL_FILE_NAME)
 
     # read holdout set and decode it
-    raw_data = pkgutil.get_data('guacamol.data', 'holdout_set_gcm_v1.smiles')
+    # raw_data = pkgutil.get_data('guacamol.data', 'holdout_set_gcm_v1.smiles')
+    raw_data = pkgutil.get_data('guacamol.data', 'holdout_set_gcm_multitarget.smiles')
     assert raw_data is not None
     data = raw_data.decode('utf-8').splitlines()
 
@@ -235,14 +241,14 @@ def main():
     write_smiles(train_set, train_path)
 
     # check the hashes
-    valid_hashes = [
-        compare_hash(train_path, TRAIN_HASH),
-        compare_hash(dev_path, VALID_HASH),
-        compare_hash(test_path, TEST_HASH),
-    ]
+    # valid_hashes = [
+    #     compare_hash(train_path, TRAIN_HASH),
+    #     compare_hash(dev_path, VALID_HASH),
+    #     compare_hash(test_path, TEST_HASH),
+    # ]
 
-    if not all(valid_hashes):
-        raise SystemExit('Invalid hashes for the dataset files')
+    # if not all(valid_hashes):
+    #     raise SystemExit('Invalid hashes for the dataset files')
 
     print('Dataset generation successful. You are ready to go.')
 

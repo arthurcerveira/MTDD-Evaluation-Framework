@@ -11,7 +11,7 @@ from baselines.smiles_lstm_hc.goal_directed_generation import SmilesRnnDirectedG
 from baselines.best_from_chembl.optimizer import BestFromChemblOptimizer
 from baselines.best_from_chembl.chembl_file_reader import ChemblFileReader
 
-SMILES_HTS_FILE = 'guacamol/data/guacamol_v1_50k.smiles'
+SMILES_HTS_FILE = 'guacamol/data/chembl24_canon_train.smiles'
 
 print("Generating molecules with GB_GA_Generator")
 
