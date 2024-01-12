@@ -67,9 +67,17 @@ class GoalDirectedBenchmark:
         """
         number_molecules_to_generate = max(self.contribution_specification.top_counts)
         start_time = time.time()
-        molecules = model.generate_optimized_molecules(scoring_function=self.wrapped_objective,
-                                                       number_molecules=number_molecules_to_generate,
-                                                       starting_population=self.starting_population
+
+        try:
+            molecules = model.generate_optimized_molecules(scoring_function=self.wrapped_objective,
+                                                           number_molecules=number_molecules_to_generate,
+                                                           starting_population=self.starting_population,
+                                                           benchmark_name=self.name
+                                                        )
+        except:
+            molecules = model.generate_optimized_molecules(scoring_function=self.wrapped_objective,
+                                                        number_molecules=number_molecules_to_generate,
+                                                        starting_population=self.starting_population
                                                        )
         end_time = time.time()
 

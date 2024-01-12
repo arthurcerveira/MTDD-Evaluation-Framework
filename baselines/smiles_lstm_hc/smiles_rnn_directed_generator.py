@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import List, Optional
-
+import os
 import joblib
 import torch
 
@@ -49,7 +49,7 @@ class SmilesRnnDirectedGenerator(GoalDirectedGenerator):
         return [smile for score, smile in scored_smiles][:k]
 
     def generate_optimized_molecules(self, scoring_function: ScoringFunction, number_molecules: int,
-                                     starting_population: Optional[List[str]] = None) -> List[str]:
+                                     starting_population: Optional[List[str]] = None, benchmark_name=None) -> List[str]:
 
         # fetch initial population?
         if starting_population is None:
@@ -57,8 +57,19 @@ class SmilesRnnDirectedGenerator(GoalDirectedGenerator):
             if self.random_start:
                 starting_population = []
             else:
-                all_smiles = self.load_smiles_from_file(self.smi_file)
-                starting_population = self.top_k(all_smiles, scoring_function, self.mols_to_sample)
+                current_path = os.path.dirname(os.path.realpath(__file__))
+                top_k_smiles_folder = os.path.join(current_path, '..', '..', 'guacamol', 'data', 'top_k')
+                top_k_smiles_path = os.path.join(top_k_smiles_folder, f'{benchmark_name}.smiles')
+
+                if os.path.isfile(top_k_smiles_path):
+                    print(f'Loading top k smiles for {benchmark_name} from {top_k_smiles_path}')
+                    starting_population = self.load_smiles_from_file(top_k_smiles_path)
+                    starting_population = starting_population[:self.mols_to_sample]
+
+                else:
+                    print('No top k smiles found, running top k on all smiles')
+                    all_smiles = self.load_smiles_from_file(self.smi_file)
+                    starting_population = self.top_k(all_smiles, scoring_function, self.mols_to_sample)
 
         cuda_available = torch.cuda.is_available()
         device = "cuda" if cuda_available else "cpu"

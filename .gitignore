@@ -5,6 +5,7 @@ data/*.txt
 !data/ROS1-ChEMBL.csv
 guacamol/data/guacamol_v1_*
 guacamol/data/chembl24_*
+guacamol/data/top_k/*.smiles
 baselines/data/*
 baselines/*/pretrained_model/
 target-selection/full-database.xml

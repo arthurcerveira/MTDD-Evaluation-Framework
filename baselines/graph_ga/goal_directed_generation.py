@@ -111,7 +111,7 @@ class GB_GA_Generator(GoalDirectedGenerator):
 
 
     def generate_optimized_molecules(self, scoring_function: ScoringFunction, number_molecules: int,
-                                     starting_population: Optional[List[str]] = None) -> List[str]:
+                                     starting_population: Optional[List[str]] = None, benchmark_name=None) -> List[str]:
         if number_molecules > self.population_size:
             self.population_size = number_molecules
             print(f'Benchmark requested more molecules than expected: new population is {number_molecules}')
@@ -122,7 +122,18 @@ class GB_GA_Generator(GoalDirectedGenerator):
             if self.random_start:
                 starting_population = np.random.choice(self.all_smiles, self.population_size)
             else:
-                starting_population = self.top_k(self.all_smiles, scoring_function, self.population_size)
+                current_path = os.path.dirname(os.path.realpath(__file__))
+                top_k_smiles_folder = os.path.join(current_path, '..', '..', 'guacamol', 'data', 'top_k')
+                top_k_smiles_path = os.path.join(top_k_smiles_folder, f'{benchmark_name}.smiles')
+
+                if os.path.isfile(top_k_smiles_path):
+                    print(f'Loading top k smiles for {benchmark_name} from {top_k_smiles_path}')
+                    starting_population = self.load_smiles_from_file(top_k_smiles_path)
+                    starting_population = starting_population[:self.population_size]
+
+                else:
+                    print('No top k smiles found, running top k on all smiles')
+                    starting_population = self.top_k(self.all_smiles, scoring_function, self.population_size)
 
         # select initial population
         population_smiles = heapq.nlargest(self.population_size, starting_population, key=scoring_function.score)

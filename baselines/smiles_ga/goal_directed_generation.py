@@ -126,7 +126,7 @@ class ChemGEGenerator(GoalDirectedGenerator):
         return [smile for score, smile in scored_smiles][:k]
 
     def generate_optimized_molecules(self, scoring_function: ScoringFunction, number_molecules: int,
-                                     starting_population: Optional[List[str]] = None) -> List[str]:
+                                     starting_population: Optional[List[str]] = None, benchmark_name=None) -> List[str]:
 
         if number_molecules > self.population_size:
             self.population_size = number_molecules
@@ -140,7 +140,18 @@ class ChemGEGenerator(GoalDirectedGenerator):
             if self.random_start:
                 starting_population = np.random.choice(all_smiles, init_size)
             else:
-                starting_population = self.top_k(all_smiles, scoring_function, init_size)
+                current_path = os.path.dirname(os.path.realpath(__file__))
+                top_k_smiles_folder = os.path.join(current_path, '..', '..', 'guacamol', 'data', 'top_k')
+                top_k_smiles_path = os.path.join(top_k_smiles_folder, f'{benchmark_name}.smiles')
+
+                if os.path.isfile(top_k_smiles_path):
+                    print(f'Loading top k smiles for {benchmark_name} from {top_k_smiles_path}')
+                    starting_population = self.load_smiles_from_file(top_k_smiles_path)
+                    starting_population = starting_population[:init_size]
+
+                else:
+                    print('No top k smiles found, running top k on all smiles')
+                    starting_population = self.top_k(all_smiles, scoring_function, init_size)
 
         # The smiles GA cannot deal with '%' in SMILES strings (used for two-digit ring numbers).
         starting_population = [smiles for smiles in starting_population if '%' not in smiles]

@@ -1,9 +1,11 @@
 import heapq
 from typing import List, Optional, Tuple
+import os
 
 import joblib
 from guacamol.goal_directed_generator import GoalDirectedGenerator
 from guacamol.scoring_function import ScoringFunction
+from guacamol.utils.chemistry import canonicalize
 from joblib import delayed
 
 from .chembl_file_reader import ChemblFileReader
@@ -33,10 +35,26 @@ class BestFromChemblOptimizer(GoalDirectedGenerator):
         scored_smiles = sorted(scored_smiles, key=lambda x: x[0], reverse=True)
         return [smile for score, smile in scored_smiles][:k]
 
+    def load_smiles_from_file(self, smi_file):
+        with open(smi_file) as f:
+            return self.pool(delayed(canonicalize)(s.strip()) for s in f)
 
     def generate_optimized_molecules(self, scoring_function: ScoringFunction, number_molecules: int,
-                                     starting_population: Optional[List[str]] = None) -> List[str]:
+                                     starting_population: Optional[List[str]] = None, benchmark_name=None) -> List[str]:
         """
         Will iterate through the reference set of SMILES strings and select the best molecules.
         """
-        return self.top_k(self.smiles, scoring_function, number_molecules)
+        current_path = os.path.dirname(os.path.realpath(__file__))
+        top_k_smiles_folder = os.path.join(current_path, '..', '..', 'guacamol', 'data', 'top_k')
+        top_k_smiles_path = os.path.join(top_k_smiles_folder, f'{benchmark_name}.smiles')
+
+        if os.path.isfile(top_k_smiles_path):
+            print(f'Loading top k smiles for {benchmark_name} from {top_k_smiles_path}')
+            top_k_smi = self.load_smiles_from_file(top_k_smiles_path)
+            top_k_smi = top_k_smi[:number_molecules]
+
+        else:
+            print('No top k smiles found, running top k on all smiles')
+            top_k_smi = self.top_k(self.smiles, scoring_function, number_molecules)
+
+        return top_k_smi
