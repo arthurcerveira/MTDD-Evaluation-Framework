@@ -1,4 +1,5 @@
 import os
+from contextlib import suppress
 
 import pandas as pd
 from bambu.download import download_pubchem_assay_data
@@ -16,23 +17,25 @@ BBB_URI = "https://raw.githubusercontent.com/omixlab/alzheimer-drug-ml/main/data
 
 def smiles_to_inchi(smiles, max_mols=10_000):
     mols = list()
+    idxs = list()
     
-    for smi in smiles:
-        try:
+    for idx, smi in enumerate(smiles):
+        mol = None
+
+        with suppress(Exception):
             mol = Chem.MolFromSmiles(smi)
-        except:
-            continue
 
         if mol is None:
             continue
 
         inchi = Chem.MolToInchi(mol)
         mols.append(inchi)
+        idxs.append(idx)
 
         if len(mols) >= max_mols:
             break       
 
-    return mols
+    return mols, idxs
 
 
 def get_zinc_dataset(output="data/ZINC.csv"):
@@ -41,7 +44,7 @@ def get_zinc_dataset(output="data/ZINC.csv"):
     ).sample(frac=1.0)  # Shuffle the data
     
     # Convert smiles to InChI
-    inchis = smiles_to_inchi(zinc_complete["smiles"], max_mols=1_000_000)
+    inchis, _ = smiles_to_inchi(zinc_complete["smiles"], max_mols=1_000_000)
     zinc = pd.DataFrame({
         "InChI": inchis,
         # Zinc is used as a source of inactive examples
@@ -185,8 +188,8 @@ def get_bbb_dataset(output="data/BBB.csv"):
 
 def get_ros1_dataset(output="data/ROS1.csv"):
     ros1 = pd.read_csv("data/ROS1-ChEMBL.csv", sep=";")
-    inchis = smiles_to_inchi(ros1["Smiles"])
-    activities = ros1["Standard Type"].apply(
+    inchis, idxs = smiles_to_inchi(ros1["Smiles"])
+    activities = ros1["Standard Type"].iloc[idxs].apply(
         lambda x: "active" if x.lower() == "inhibition" else "inactive"
     )
 
@@ -196,6 +199,26 @@ def get_ros1_dataset(output="data/ROS1.csv"):
     })    
 
     ros1.to_csv(output, index=False)
+
+
+# https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:D5WbAU-ghVOND87IXSk10g==
+def get_maob_dataset(output="data/MAOB.csv"):
+    maob = pd.read_csv("data/MAOB-ChEMBL.tsv", sep="\t")
+    inchis, idxs = smiles_to_inchi(maob["Smiles"])
+    activities = maob["Standard Type"].iloc[idxs].apply(
+        lambda x: "active" if x.lower() == "inhibition" else "inactive"
+    )
+
+    maob = pd.DataFrame({
+        "InChI": inchis,
+        "activity": activities
+    })
+
+    maob = maob.sort_values(
+        by=["activity"], ascending=True
+    ).drop_duplicates(subset=["InChI"])
+
+    maob.to_csv(output, index=False)
 
 
 def get_d4_dataset(output="data/D4R.csv"):
@@ -234,6 +257,7 @@ if __name__ == "__main__":
     # get_zinc_dataset()
     # get_nrtk3_assays()
     # get_nrtk1_assays()
-    # get_bbb_dataset()
     # get_ros1_dataset()
-    get_d4_dataset()
+    # get_d4_dataset()
+    get_bbb_dataset()
+    get_maob_dataset()

@@ -16,7 +16,8 @@ from guacamol.common_scoring_functions import (
 from guacamol.models import (
     MORGAN_PREPROCESSOR,
     ACHE_MODEL,
-    APP_MODEL,
+    MAOB_MODEL,
+    # APP_MODEL,
     D2R_MODEL,
     _5HT1A_MODEL,
     NTRK1_MODEL,
@@ -40,7 +41,7 @@ def alzheimer_mpo_benchmark() -> GoalDirectedBenchmark:
     Benchmark to evaluate multi-target molecules active against Alzheimer's disease.
     Targets considered:
     - Acetylcholinesterase (AChE)
-    - Amyloid-β peptide (APP)
+    - Monoamine oxidase B (MAO-B)
     Other criteria:
     - Pass through blood-brain barrier (BBB)
     - Physicochemical Properties for Optimal Brain Exposure
@@ -50,12 +51,12 @@ def alzheimer_mpo_benchmark() -> GoalDirectedBenchmark:
         target='AChE', model=ACHE_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
-    app_scorer = TargetResponseScoringFunction(
-        target='APP', model=APP_MODEL, preprocessor=MORGAN_PREPROCESSOR
+    maob_scorer = TargetResponseScoringFunction(
+        target='MAO-B', model=MAOB_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     mean_effectiveness = GeometricMeanScoringFunction(
-        [ache_scorer, app_scorer]
+        [ache_scorer, maob_scorer]
     )
 
     bbb_scorer = TargetResponseScoringFunction(

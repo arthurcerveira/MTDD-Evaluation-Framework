@@ -11,17 +11,18 @@ from bambu.train import train
 from bambu.validate import validate
 
 
-BIOASSAY_IDS = {
-    "APP": 1276,
+BIOASSAY_IDS = {    
     "AChE": 1347395,
     "BBB": None,
     "D2R": 485344,
     "_5HT1A": 624169,
+    "D3R": 652048,
+    "MAOB": None
+    # "APP": 1276,
     # "NTRK3": None,
     # "NTRK1": None,
     # "ROS1": None,
-    "D3R": 652048,
-    "D4R": None,
+    # "D4R": None,
 }
 
 

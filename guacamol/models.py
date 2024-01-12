@@ -26,6 +26,7 @@ _5HT1A_MODEL = load_pickled_model(os.path.join(MODEL_DIR, '_5HT1A.pkl'))
 NTRK1_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'NTRK1.pkl'))
 NTRK3_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'NTRK3.pkl'))
 ROS1_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'ROS1.pkl'))
+MAOB_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'MAOB.pkl'))
 
 # Other criterion
 BBB_MODEL = load_pickled_model(os.path.join(MODEL_DIR, 'BBB.pkl'))

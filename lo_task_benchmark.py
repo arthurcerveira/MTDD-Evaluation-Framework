@@ -21,9 +21,9 @@ def load_bioassay_dataframe(target):
     df = df.dropna(subset=["InChI"])
     df = df.drop_duplicates(subset=["InChI"])
 
-    if len(df) > 7_000:
-        rus = RandomUnderSampler(random_state=42)
-        df, _ = rus.fit_resample(df, df["activity"])
+    # Undersample the majority class before splitting into LO train/test
+    rus = RandomUnderSampler(random_state=42)
+    df, _ = rus.fit_resample(df, df["activity"])
         
     inchi_to_smiles = lambda x: Chem.MolToSmiles(Chem.inchi.MolFromInchi(x))
 
@@ -138,12 +138,6 @@ if __name__ == "__main__":
         if len(test) == 0 or train['activity'].nunique() < 2:
             print("LO split failed")
             continue
-
-            # print("Test lenght:", len(test))
-
-            # train, test = train_test_split(df, test_size=0.25, random_state=42)
-            # train['cluster'] = 0
-            # test['cluster'] = 1
 
         print("Unique train classes:\n", train['activity'].value_counts())
         print("\nUnique test classes:\n", test['activity'].value_counts())
