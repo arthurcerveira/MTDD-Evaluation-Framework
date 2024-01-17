@@ -1,3 +1,4 @@
+#%%
 import os
 
 from guacamol.assess_goal_directed_generation import assess_goal_directed_generation
@@ -11,8 +12,12 @@ from baselines.smiles_lstm_hc.goal_directed_generation import SmilesRnnDirectedG
 from baselines.best_from_chembl.optimizer import BestFromChemblOptimizer
 from baselines.best_from_chembl.chembl_file_reader import ChemblFileReader
 
-SMILES_HTS_FILE = 'guacamol/data/chembl24_canon_train.smiles'
 
+SMILES_HTS_FILE = 'guacamol/data/guacamol_v1_50k.smiles'
+N_JOBS = -1
+
+
+#%%
 print("Generating molecules with GB_GA_Generator")
 
 optimiser = GB_GA_Generator(
@@ -22,7 +27,7 @@ optimiser = GB_GA_Generator(
     generations=1000,
     mutation_rate=0.01,
     patience=5,
-    n_jobs=-1,
+    n_jobs=N_JOBS,
     random_start=False,
 )
 
@@ -32,6 +37,7 @@ assess_goal_directed_generation(
     optimiser, json_output_file=json_file_path, benchmark_version="multitarget"
 )
 
+#%%
 print("Generating molecules with ChemGEGenerator")
 
 optimiser = ChemGEGenerator(
@@ -40,7 +46,7 @@ optimiser = ChemGEGenerator(
     n_mutations=200,
     gene_size=300,
     generations=1000,
-    n_jobs=-1,
+    n_jobs=N_JOBS,
     random_start=False,
     patience=5
 )
@@ -51,51 +57,13 @@ assess_goal_directed_generation(
     optimiser, json_output_file=json_file_path, benchmark_version="multitarget"
 )
 
-print("Generating molecules with PPODirectedGenerator")
-
-model_path = os.path.join("baselines/smiles_lstm_ppo/", 'pretrained_model', 'model_final_0.473.pt')
-
-optimiser = PPODirectedGenerator(
-    pretrained_model_path=model_path,
-    num_epochs=20,
-    episode_size=8192,
-    batch_size=1024,
-    entropy_weight=1,
-    kl_div_weight=10,
-    clip_param=0.2
-)
-
-json_file_path = os.path.join("reports", 'smiles_lstm_ppo.json')
-
-assess_goal_directed_generation(
-    optimiser, json_output_file=json_file_path, benchmark_version="multitarget"
-)
-
-# TODO
-# optimiser = GB_MCTS_Generator(
-#     pickle_directory="baselines/graph_mcts/",
-#     n_jobs=16,
-#     num_sims=40,
-#     max_children=25,
-#     init_smiles='CC',
-#     max_atoms=60,
-#     generations=1000,
-#     population_size=100,
-# )
-
-# json_file_path = os.path.join("reports", 'graph_mcts.json')
-
-# assess_goal_directed_generation(
-#     optimiser, json_output_file=json_file_path, benchmark_version="multitarget"
-# )
-
+#%%
 print("Generating molecules with RandomSmilesSampler")
 
 with open(SMILES_HTS_FILE, 'r') as smiles_file:
     smiles_list = smiles_file.readlines()
 
 sampler = RandomSmilesSampler(molecules=smiles_list)
-
 optimiser = RandomSamplingOptimizer(sampler=sampler)
 
 json_file_path = os.path.join("reports", 'random_smiles.json')
@@ -104,20 +72,20 @@ assess_goal_directed_generation(
     optimiser, json_output_file=json_file_path, benchmark_version="multitarget"
 )
 
+#%%
 print("Generating molecules with BestFromChemblOptimizer")
 
 smiles_reader = ChemblFileReader(SMILES_HTS_FILE)
-
-optimizer = BestFromChemblOptimizer(smiles_reader=smiles_reader, n_jobs=-1)
+optimizer = BestFromChemblOptimizer(smiles_reader=smiles_reader, n_jobs=N_JOBS)
 
 json_file_path = os.path.join("reports", 'best_from_chembl.json')
 
 assess_goal_directed_generation(optimizer, json_output_file=json_file_path, benchmark_version="multitarget")
 
+#%%
 print("Generating molecules with SmilesRnnDirectedGenerator")
 
 model_path = os.path.join("baselines/smiles_lstm_hc", 'pretrained_model', 'model_final_0.473.pt')
-
 optimizer = SmilesRnnDirectedGenerator(pretrained_model_path=model_path,
                                         n_epochs=20,
                                         mols_to_sample=1024,
@@ -128,9 +96,11 @@ optimizer = SmilesRnnDirectedGenerator(pretrained_model_path=model_path,
                                         number_final_samples=4096,
                                         random_start=False,
                                         smi_file=SMILES_HTS_FILE,
-                                        n_jobs=-1)
+                                        n_jobs=N_JOBS)
 
 json_file_path = os.path.join("reports", 'smiles_lstm_hc.json')
 assess_goal_directed_generation(optimizer, json_output_file=json_file_path, benchmark_version="multitarget")
+
+#%%
 
 print("Done!")
