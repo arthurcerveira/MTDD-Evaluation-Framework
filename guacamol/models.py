@@ -8,6 +8,9 @@ def load_pickled_model(model_path):
     if model_path is None:
         return None
 
+    if not os.path.exists(model_path):
+        return None
+
     with open(model_path, 'rb') as f:
         model = pickle.load(f)
     
