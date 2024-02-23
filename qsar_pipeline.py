@@ -13,11 +13,11 @@ from bambu.validate import validate
 
 BIOASSAY_IDS = {    
     "AChE": 1347395,
-    "BBB": None,
+    "MAOB": None,
     "D2R": 485344,
-    "_5HT1A": 624169,
+    "_5HT2A": 624169,
     "D3R": 652048,
-    "MAOB": None
+    "BBB": None,
     # "APP": 1276,
     # "NTRK3": None,
     # "NTRK1": None,

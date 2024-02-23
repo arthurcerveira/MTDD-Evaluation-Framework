@@ -13,7 +13,7 @@ from baselines.best_from_chembl.optimizer import BestFromChemblOptimizer
 from baselines.best_from_chembl.chembl_file_reader import ChemblFileReader
 
 
-SMILES_HTS_FILE = 'guacamol/data/guacamol_v1_50k.smiles'
+SMILES_HTS_FILE = 'guacamol/data/chembl24_canon_train.smiles'
 N_JOBS = -1
 
 
@@ -102,5 +102,25 @@ json_file_path = os.path.join("reports", 'smiles_lstm_hc.json')
 assess_goal_directed_generation(optimizer, json_output_file=json_file_path, benchmark_version="multitarget")
 
 #%%
+print("Generating molecules with PPODirectedGenerator")
 
+model_path = os.path.join("baselines/smiles_lstm_ppo/", 'pretrained_model', 'model_final_0.473.pt')
+
+optimiser = PPODirectedGenerator(
+    pretrained_model_path=model_path,
+    num_epochs=20,
+    episode_size=8192,
+    batch_size=1024,
+    entropy_weight=1,
+    kl_div_weight=10,
+    clip_param=0.2
+)
+
+json_file_path = os.path.join("reports", 'smiles_lstm_ppo.json')
+
+assess_goal_directed_generation(
+    optimiser, json_output_file=json_file_path, benchmark_version="multitarget"
+)
+
+#%%
 print("Done!")

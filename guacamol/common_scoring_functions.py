@@ -69,6 +69,8 @@ class SyntheticAccessibilityScoringFunction(ScoringFunctionBasedOnRdkitMol):
     - SYBA
     - SCScore
     - RAscore
+    This function expects the accessibility_scorer function to
+    return Lower scores as higher synthetic accessibility.
     """
 
     def __init__(self, accessibility_scorer, min_score=1, max_score=10, score_modifier: ScoreModifier = None) -> None:
@@ -86,8 +88,10 @@ class SyntheticAccessibilityScoringFunction(ScoringFunctionBasedOnRdkitMol):
 
         # Normalize accessibility score to [0,1]
         normalized_accessibility = (accessibility - self.min_score) / (self.max_score - self.min_score)
+        # Invert accessibility score to [1,0] (higher score means higher synthetic accessibility)
+        accessibility_score = 1 - normalized_accessibility
 
-        return normalized_accessibility
+        return accessibility_score
 
 
 class RdkitScoringFunction(ScoringFunctionBasedOnRdkitMol):

@@ -15,7 +15,7 @@ metric_order = [
     "Score",
     "Target Response",
     "Blood-Brain Barrier",
-    "QED Score",
+    # "QED Score",
     "CNS MPO",
     "Synthetic Accessibility",
 ]
@@ -23,7 +23,8 @@ metric_order = [
 benchmark_order = [
     "Alzheimer MPO",
     "Schizophrenia MPO",
-    "Lung cancer MPO"
+    # "Lung cancer MPO"
+    "Parkinson MPO",
 ]
 
 report_results = list()
@@ -35,8 +36,8 @@ def get_metadata_keys(metadata):
     target = [k for k in keys if "GeometricMeanScoringFunction" in k]
     target_scores = metadata[target[0]] if len(target) > 0 else None
         
-    qed = [k for k in keys if "RdkitScoringFunction" in k]
-    qed_scores = metadata[qed[0]] if len(qed) > 0 else None
+    # qed = [k for k in keys if "RdkitScoringFunction" in k]
+    # qed_scores = metadata[qed[0]] if len(qed) > 0 else None
 
     bbb = [k for k in keys if "TargetResponseScoringFunction" in k]
     bbb_scores = metadata[bbb[0]] if len(bbb) > 0 else None
@@ -50,7 +51,7 @@ def get_metadata_keys(metadata):
     return {
         "Target Response": target_scores,
         "Blood-Brain Barrier": bbb_scores,
-        "QED Score": qed_scores,
+        # "QED Score": qed_scores,
         "Synthetic Accessibility": sa_scores,
         "CNS MPO": cns_scores        
     }

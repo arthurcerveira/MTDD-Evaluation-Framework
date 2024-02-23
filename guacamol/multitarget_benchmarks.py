@@ -19,7 +19,7 @@ from guacamol.models import (
     MAOB_MODEL,
     # APP_MODEL,
     D2R_MODEL,
-    _5HT1A_MODEL,
+    _5HT2A_MODEL,
     NTRK1_MODEL,
     NTRK3_MODEL,
     ROS1_MODEL,
@@ -100,7 +100,7 @@ def schizophrenia_mpo_benchmark() -> GoalDirectedBenchmark:
     )
 
     _5ht2a_scorer = TargetResponseScoringFunction(
-        target='5-HT2A', model=_5HT1A_MODEL, preprocessor=MORGAN_PREPROCESSOR
+        target='5-HT2A', model=_5HT2A_MODEL, preprocessor=MORGAN_PREPROCESSOR
     )
 
     mean_effectiveness = GeometricMeanScoringFunction(
