@@ -48,9 +48,11 @@ def qsar_pipeline(target, assay_id):
         input_train=f"data/{target}-Preprocessed.csv",
         output=f"models/{target}.pkl",
         estimators=['rf', 'extra_tree', 'decision_tree', 'svm', 
-                    'logistic_regression', 'gradient_boosting'],
-        threads=15,
-        max_iter=100,
+                    'logistic_regression', 'gradient_boosting', 
+                    'neural_network'],
+        threads=7,
+        # max_iter=100,
+        time_budget=3600,
     )
 
     df = pd.read_csv(f"data/{target}-Preprocessed.csv")

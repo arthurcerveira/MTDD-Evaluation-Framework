@@ -1,16 +1,16 @@
 Benchmark,Metric,LSTM-PPO,LSTM-HC,SMILES GA,Graph GA,Best of dataset
-Alzheimer MPO,Score,0.72673,0.80053,0.72678,0.81672,0.74570
-Alzheimer MPO,Target Response,0.539 ± 0.062,0.684 ± 0.039,0.660 ± 0.048,0.788 ± 0.018,0.596 ± 0.054
-Alzheimer MPO,Blood-Brain Barrier,0.761 ± 0.107,0.907 ± 0.027,0.857 ± 0.064,0.906 ± 0.017,0.894 ± 0.083
-Alzheimer MPO,CNS MPO,0.943 ± 0.068,0.950 ± 0.041,0.930 ± 0.052,0.827 ± 0.039,0.905 ± 0.069
-Alzheimer MPO,Synthetic Accessibility,0.590 ± 0.084,0.653 ± 0.031,0.757 ± 0.012,0.744 ± 0.027,0.583 ± 0.068
-Schizophrenia MPO,Score,0.72685,0.79585,0.75808,0.79917,0.74904
-Schizophrenia MPO,Target Response,0.498 ± 0.099,0.627 ± 0.014,0.624 ± 0.021,0.639 ± 0.015,0.595 ± 0.068
-Schizophrenia MPO,Blood-Brain Barrier,0.864 ± 0.096,0.932 ± 0.017,0.896 ± 0.038,0.922 ± 0.018,0.927 ± 0.049
-Schizophrenia MPO,CNS MPO,0.906 ± 0.071,0.966 ± 0.014,0.904 ± 0.051,0.940 ± 0.023,0.875 ± 0.065
-Schizophrenia MPO,Synthetic Accessibility,0.619 ± 0.091,0.690 ± 0.022,0.756 ± 0.014,0.723 ± 0.027,0.610 ± 0.072
-Parkinson MPO,Score,0.70312,0.78753,0.77947,0.79545,0.74009
-Parkinson MPO,Target Response,0.489 ± 0.089,0.615 ± 0.020,0.591 ± 0.021,0.649 ± 0.018,0.581 ± 0.045
-Parkinson MPO,Blood-Brain Barrier,0.795 ± 0.122,0.928 ± 0.022,0.905 ± 0.028,0.890 ± 0.022,0.929 ± 0.052
-Parkinson MPO,CNS MPO,0.939 ± 0.068,0.968 ± 0.014,0.925 ± 0.036,0.915 ± 0.030,0.888 ± 0.060
-Parkinson MPO,Synthetic Accessibility,0.613 ± 0.101,0.672 ± 0.030,0.752 ± 0.018,0.737 ± 0.017,0.587 ± 0.060
+Alzheimer MPO,Score,0.91889,0.94999,0.94333,0.95355,0.94333
+Alzheimer MPO,Target Response,0.810 ± 0.028,0.901 ± 0.016,0.873 ± 0.025,0.917 ± 0.015,0.873 ± 0.025
+Alzheimer MPO,Blood-Brain Barrier,0.991 ± 0.014,0.997 ± 0.005,0.994 ± 0.008,0.996 ± 0.006,0.994 ± 0.008
+Alzheimer MPO,CNS MPO,0.981 ± 0.023,0.994 ± 0.010,0.988 ± 0.015,0.998 ± 0.003,0.988 ± 0.015
+Alzheimer MPO,Synthetic Accessibility,0.850 ± 0.029,0.896 ± 0.012,0.887 ± 0.024,0.893 ± 0.012,0.887 ± 0.024
+Schizophrenia MPO,Score,0.82276,0.83002,0.82893,0.83000,0.82893
+Schizophrenia MPO,Target Response,0.501 ± 0.002,0.500 ± 0.001,0.500 ± 0.001,0.500 ± 0.001,0.500 ± 0.001
+Schizophrenia MPO,Blood-Brain Barrier,0.997 ± 0.006,0.998 ± 0.003,0.996 ± 0.004,0.997 ± 0.003,0.996 ± 0.004
+Schizophrenia MPO,CNS MPO,0.993 ± 0.012,0.996 ± 0.007,0.993 ± 0.009,0.996 ± 0.006,0.993 ± 0.009
+Schizophrenia MPO,Synthetic Accessibility,0.904 ± 0.017,0.947 ± 0.009,0.943 ± 0.012,0.948 ± 0.008,0.943 ± 0.012
+Parkinson MPO,Score,0.88783,0.89956,0.89787,0.89949,0.89787
+Parkinson MPO,Target Response,0.700 ± 0.010,0.710 ± 0.003,0.708 ± 0.004,0.710 ± 0.002,0.708 ± 0.004
+Parkinson MPO,Blood-Brain Barrier,0.995 ± 0.007,0.999 ± 0.002,0.998 ± 0.004,0.999 ± 0.002,0.998 ± 0.004
+Parkinson MPO,CNS MPO,0.988 ± 0.015,0.997 ± 0.005,0.992 ± 0.010,0.996 ± 0.005,0.992 ± 0.010
+Parkinson MPO,Synthetic Accessibility,0.877 ± 0.021,0.920 ± 0.006,0.913 ± 0.011,0.920 ± 0.007,0.913 ± 0.011

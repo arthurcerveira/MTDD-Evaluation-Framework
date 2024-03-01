@@ -23,10 +23,10 @@ class NeuralNetworkEstimator(SKLearnEstimator):
                 NETWORK_CONFIGURATIONS.append(configuration)
 
         search_space = {
-            "hidden_layer_sizes": {
-                "domain": tune.choice(NETWORK_CONFIGURATIONS),
-                "init_value": NETWORK_CONFIGURATIONS[0]
-            },
+            # "hidden_layer_sizes": {
+            #     "domain": tune.choice(NETWORK_CONFIGURATIONS),
+            #     "init_value": NETWORK_CONFIGURATIONS[0]
+            # },
         
             "activation": {
                 "domain": tune.choice(["identity", "logistic", "tanh", "relu"]),
