@@ -38,6 +38,7 @@ def get_argparser():
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-o', '--destination', default='.', help='Download and Output location')
     parser.add_argument('--n_jobs', default=8, type=int, help='Number of cores to use')
+    parser.add_argument('--holdout', default='holdout_set_gcm_v1.smiles', help='Holdout set to filter molecules')
     return parser
 
 
@@ -182,8 +183,10 @@ def main():
     chembl_file = os.path.join(args.destination, CHEMBL_FILE_NAME)
 
     # read holdout set and decode it
-    # raw_data = pkgutil.get_data('guacamol.data', 'holdout_set_gcm_v1.smiles')
-    raw_data = pkgutil.get_data('guacamol.data', 'holdout_set_gcm_multitarget.smiles')
+    raw_data = pkgutil.get_data('guacamol.data', args.holdout)
+
+    print(f"Filtering molecules from the holdout set {args.holdout}.")
+
     assert raw_data is not None
     data = raw_data.decode('utf-8').splitlines()
 
