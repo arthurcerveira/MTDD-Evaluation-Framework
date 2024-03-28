@@ -90,5 +90,43 @@ def train(input_train, output, estimators=['rf'], threads=1, time_budget=None, m
         model_writer.write(pickle.dumps(automl, protocol=pickle.HIGHEST_PROTOCOL))
 
 
+def train_lo_split(input_train, input_val, output, estimators=['rf'],
+                   threads=1, time_budget=None, max_iter=None,
+                   metric=None, eval_method='auto', retrain_full=False,
+                   model_history=False):
+
+    df_train = pd.read_csv(input_train)
+
+    X_train = df_train.drop(['activity'], axis=1)
+    y_train = df_train['activity']
+
+    df_val = pd.read_csv(input_val)
+
+    X_val = df_val.drop(['activity'], axis=1)
+    y_val = df_val['activity']
+
+    automl = AutoML()
+
+    for estimator_name, estimator_class in CUSTOM_ESTIMATORS.items():
+       automl.add_learner(estimator_name, estimator_class)
+
+    automl.fit(
+        X_train, y_train,
+        X_val=X_val,
+        y_val=y_val,
+        task="classification",
+        estimator_list=estimators,
+        n_jobs=threads,
+        time_budget=time_budget,
+        max_iter=max_iter,
+        metric=metric,
+        retrain_full=retrain_full,
+        model_history=model_history
+    )
+
+    with open(output, 'wb') as model_writer:
+        model_writer.write(pickle.dumps(automl, protocol=pickle.HIGHEST_PROTOCOL))
+
+
 if __name__ == "__main__":
     main()

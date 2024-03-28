@@ -16,6 +16,13 @@ import numpy as np
 import pickle
 import os
 import sys
+from pathlib import Path
+
+root_dir = Path(__file__).resolve().parents[2]
+sys.path.append(str(root_dir))
+
+from scripts.lo_task_benchmark import split_lohi, load_bioassay_dataframe
+
 
 def main():
 
@@ -144,6 +151,71 @@ def preprocess(input_file, output_file, output_preprocessor_file, feature_type, 
         df_output_test['activity'] = y_test
         df_output_test = clean_dataset(df_output_test)
         df_output_test.to_csv(test_filepath, index=False)
+
+
+def preprocess_lo_split(input_file, output_file_train, output_file_val, output_preprocessor_file, feature_type,
+                        mol2vec_model_path=''):
+
+    df = load_bioassay_dataframe(assay_file=input_file)
+    print("Splitting into LO train/test...")
+    train, test = split_lohi(df)
+
+    # Convert back to InChI
+    train['InChI'] = train['smiles'].apply(lambda x: Chem.MolToInchi(Chem.MolFromSmiles(x)))
+    test['InChI'] = test['smiles'].apply(lambda x: Chem.MolToInchi(Chem.MolFromSmiles(x)))
+
+    print("Train shape:", train.shape)
+    print("Test shape:", test.shape)
+
+    print("Unique train classes:\n", train['activity'].value_counts())
+    print("\nUnique test classes:\n", test['activity'].value_counts())
+
+    for df_input, output in [(train, output_file_train), (test, output_file_val)]:
+        # df_input = pd.DataFrame(df.drop(['activity'], axis=1))
+        # df_input['activity'] = df['activity']
+
+        if feature_type.startswith('morgan'):
+            bits = int(feature_type.split('-')[1])
+            preprocessor = MorganPreprocessor(bits=bits, radius=2)
+
+        elif feature_type == "descriptors":
+            preprocessor = DescriptorsPreprocessor()
+
+        elif feature_type == "mol2vec":
+            if mol2vec_model_path is None:
+                raise Exception("The path to a pretrained model must be passed when using mol2vec features")
+            if not os.path.isfile(mol2vec_model_path):
+                raise Exception(f"The path '{mol2vec_model_path}' is not a valid mol2vec model")
+            preprocessor = Mol2VecPreprocessor(pretrained_model=mol2vec_model_path)
+
+
+        features = list()
+
+        for r, row in tqdm(df_input.iterrows(), total=df_input.shape[0]):
+
+            mol = Chem.inchi.MolFromInchi(row.InChI)
+
+            if mol is None:
+                print(row.InChI)
+
+            mol_features = preprocessor.compute_features(mol)
+            mol_features = {f'morgan_fp_bit_{i}': v for i, v in enumerate(mol_features)}
+
+            mol_features['activity'] = row.activity
+
+            features.append(mol_features)
+
+        df_features = pd.DataFrame(features, columns=[*preprocessor.features, 'activity'])
+        df_features.to_csv(
+            output,
+            index=False,
+            mode='w',
+            header=True
+        )
+
+        with open(output_preprocessor_file, 'wb') as preprocessor_writer:
+            preprocessor_writer.write(pickle.dumps(preprocessor, protocol=pickle.HIGHEST_PROTOCOL))
+
 
 def clean_dataset(df):
     df       = df.astype(np.float32, errors = 'ignore')

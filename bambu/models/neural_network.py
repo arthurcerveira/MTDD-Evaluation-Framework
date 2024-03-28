@@ -45,7 +45,7 @@ class NeuralNetworkEstimator(SKLearnEstimator):
                 "init_value": 1
             },
             "learning_rate": {
-                "domain": tune.choice(["constant", "ïnvscaling", "adaptative"]),
+                "domain": tune.choice(['adaptive', 'invscaling', 'constant']),
                 "init_value": "constant"
             },
             "learning_rate_init": {

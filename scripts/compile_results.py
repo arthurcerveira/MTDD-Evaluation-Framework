@@ -1,14 +1,16 @@
 import json
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
+report_path = Path(__file__).resolve().parents[1] / "reports"
 
 METHODS = {
-    "LSTM-PPO": "reports/smiles_lstm_ppo.json",
-    "LSTM-HC": "reports/smiles_lstm_hc.json",
-    "SMILES GA": "reports/smiles_ga.json",
-    "Graph GA": "reports/graph_ga.json",
-    "Best of dataset": "reports/best_from_chembl.json",
+    "LSTM-PPO": report_path / "smiles_lstm_ppo.json",
+    "LSTM-HC": report_path / "smiles_lstm_hc.json",
+    "SMILES GA": report_path / "smiles_ga.json",
+    "Graph GA": report_path / "graph_ga.json",
+    "Best of dataset": report_path / "best_from_chembl.json",
 }
 
 metric_order = [

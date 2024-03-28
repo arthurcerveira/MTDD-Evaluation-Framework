@@ -11,11 +11,31 @@ from sklearn.metrics import (
     accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 )
 
-from qsar_pipeline import BIOASSAY_IDS
+import sys
+from pathlib import Path
+
+current_dir = Path(__file__).resolve().parent
+data_dir = current_dir.parent / "data"
+models_dir = current_dir.parent / "models"
+results_dir = current_dir.parent / "reports"
+sys.path.append(str(current_dir.parent))
+
+RDLogger.DisableLog('rdApp.*')
+
+# from qsar_pipeline import BIOASSAY_IDS
+BIOASSAY_IDS = {    
+    "AChE": 1347395,
+    "MAOB": None,
+    "D2R": 485344,
+    "_5HT2A": 624169,
+    "D3R": 652048,
+    "BBB": None,
+}
 
 
-def load_bioassay_dataframe(target):
-    assay_file = f"data/{target}.csv"
+def load_bioassay_dataframe(target=None, assay_file=None):
+    if assay_file is None:
+        assay_file = data_dir / f"{target}.csv"
 
     df = pd.read_csv(assay_file)
     df = df.dropna(subset=["InChI"])
@@ -122,7 +142,6 @@ def fit_predict(train, test, model):
 
 
 if __name__ == "__main__":
-    RDLogger.DisableLog('rdApp.*')
     results = dict()
 
     for target in BIOASSAY_IDS:
@@ -135,7 +154,7 @@ if __name__ == "__main__":
         print("Train shape:", train.shape)
         print("Test shape:", test.shape)
 
-        if len(test) == 0 or train['activity'].nunique() < 2:
+        if len(test) == 0 or train['activity'].nunique() < 2 or test['activity'].nunique() < 2:
             print("LO split failed")
             continue
 

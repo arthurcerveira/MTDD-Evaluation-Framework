@@ -1,5 +1,11 @@
 import os
 from contextlib import suppress
+import sys
+from pathlib import Path
+
+current_dir = Path(__file__).resolve().parent
+data_dir = current_dir.parent / "data"
+sys.path.append(str(current_dir.parent))
 
 import pandas as pd
 from bambu.download import download_pubchem_assay_data
@@ -38,9 +44,9 @@ def smiles_to_inchi(smiles, max_mols=10_000):
     return mols, idxs
 
 
-def get_zinc_dataset(output="data/ZINC.csv"):
+def get_zinc_dataset(output=data_dir / "ZINC.csv"):
     zinc_complete = pd.read_csv(
-        "data/ZINC-Complete.txt", sep="\t", low_memory=False
+        data_dir / "ZINC-Complete.txt", sep="\t", low_memory=False
     ).sample(frac=1.0)  # Shuffle the data
     
     # Convert smiles to InChI
@@ -54,7 +60,7 @@ def get_zinc_dataset(output="data/ZINC.csv"):
     zinc.to_csv(output, index=False)
 
 
-def get_nrtk3_assays(output="data/NTRK3.csv"):
+def get_nrtk3_assays(output=data_dir / "NTRK3.csv"):
     # Download assays from PubChem
     nrtk3 = [
         "1229326",
@@ -66,21 +72,21 @@ def get_nrtk3_assays(output="data/NTRK3.csv"):
     for assay_id in nrtk3:
         download_pubchem_assay_data(
             pubchem_assay_id=assay_id, 
-            output=f"data/{assay_id}.csv", 
+            output=data_dir / f"{assay_id}.csv", 
             pubchem_InchI_chunksize=100
         )
 
     # Combine all the data into one file
     nrtk3_active = pd.concat([
-        pd.read_csv(f"data/{assay_id}.csv") for assay_id in nrtk3
+        pd.read_csv(data_dir / f"{assay_id}.csv") for assay_id in nrtk3
     ])
 
     # Delete temporary files
     for assay_id in nrtk3:
-        os.remove(f"data/{assay_id}.csv")
+        os.remove(data_dir / f"{assay_id}.csv")
 
     # Enrich with inactive examples
-    zinc = pd.read_csv("data/ZINC.csv")
+    zinc = pd.read_csv(data_dir / "ZINC.csv")
 
     nrtk3_inactive_lenght = len(nrtk3_active)
     nrtk3_mols = [Chem.MolFromInchi(inchi) for inchi in nrtk3_active["InChI"]]
@@ -114,19 +120,19 @@ def get_nrtk3_assays(output="data/NTRK3.csv"):
     nrtk3_assays.to_csv(output, index=False)
 
 
-def get_nrtk1_assays(output="data/NTRK1.csv"):
+def get_nrtk1_assays(output=data_dir / "NTRK1.csv"):
     print("Building NTRK1 dataset...")
     nrtk1_id = "1802770"
 
     download_pubchem_assay_data(
         pubchem_assay_id=nrtk1_id, 
-        output=f"data/{nrtk1_id}.csv", 
+        output=data_dir / f"{nrtk1_id}.csv", 
         pubchem_InchI_chunksize=100
     )
 
     # Enrich with inactive examples
-    nrtk1_active = pd.read_csv(f"data/{nrtk1_id}.csv")
-    zinc = pd.read_csv("data/ZINC.csv").sample(frac=1.0)
+    nrtk1_active = pd.read_csv(data_dir / f"{nrtk1_id}.csv")
+    zinc = pd.read_csv(data_dir / "ZINC.csv").sample(frac=1.0)
 
     nrtk1_inactive_lenght = len(nrtk1_active)
     nrtk1_mols = [Chem.MolFromInchi(inchi) for inchi in nrtk1_active["InChI"]]
@@ -162,7 +168,7 @@ def get_nrtk1_assays(output="data/NTRK1.csv"):
     nrtk1_assays = pd.concat([nrtk1_active, nrtk1_inactive])
 
     # Delete temporary files
-    os.remove(f"data/{nrtk1_id}.csv")
+    os.remove(data_dir / f"{nrtk1_id}.csv")
 
     nrtk1_assays = nrtk1_assays.drop_duplicates(
         subset=["InChI"]
@@ -171,7 +177,8 @@ def get_nrtk1_assays(output="data/NTRK1.csv"):
     nrtk1_assays.to_csv(output, index=False)
 
 
-def get_bbb_dataset(output="data/BBB.csv"):
+def get_bbb_dataset(output=data_dir / "BBB.csv"):
+    print("Building BBB dataset...")
     bbb = pd.read_csv(BBB_URI)
     bbb = bbb[["InChI", "activity"]]
 
@@ -184,10 +191,11 @@ def get_bbb_dataset(output="data/BBB.csv"):
     bbb_filter = bbb_filter[~bbb_filter["corrupted"]]
 
     bbb_filter.to_csv(output, index=False)
+    print("BBB saved to", output)
 
 
-def get_ros1_dataset(output="data/ROS1.csv"):
-    ros1 = pd.read_csv("data/ROS1-ChEMBL.csv", sep=";")
+def get_ros1_dataset(output=data_dir / "ROS1.csv"):
+    ros1 = pd.read_csv(data_dir / "ROS1-ChEMBL.csv", sep=";")
     inchis, idxs = smiles_to_inchi(ros1["Smiles"])
     activities = ros1["Standard Type"].iloc[idxs].apply(
         lambda x: "active" if x.lower() == "inhibition" else "inactive"
@@ -202,8 +210,10 @@ def get_ros1_dataset(output="data/ROS1.csv"):
 
 
 # https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:D5WbAU-ghVOND87IXSk10g==
-def get_maob_dataset(output="data/MAOB.csv"):
-    maob = pd.read_csv("data/MAOB-ChEMBL.tsv", sep="\t")
+def get_maob_dataset(output=data_dir / "MAOB.csv"):
+    print("Building MAOB dataset...")
+
+    maob = pd.read_csv(data_dir / "MAOB-ChEMBL.tsv", sep="\t")
     inchis, idxs = smiles_to_inchi(maob["Smiles"])
     activities = maob["Standard Type"].iloc[idxs].apply(
         lambda x: "active" if x.lower() == "inhibition" else "inactive"
@@ -219,9 +229,10 @@ def get_maob_dataset(output="data/MAOB.csv"):
     ).drop_duplicates(subset=["InChI"])
 
     maob.to_csv(output, index=False)
+    print("MAOB saved to", output)
 
 
-def get_d4_dataset(output="data/D4R.csv"):
+def get_d4_dataset(output=data_dir / "D4R.csv"):
     # Download assays from PubChem
     d4_ids = [
         "268991",
@@ -231,14 +242,14 @@ def get_d4_dataset(output="data/D4R.csv"):
     for assay_id in d4_ids:
         download_pubchem_assay_data(
             pubchem_assay_id=assay_id,
-            output=f"data/{assay_id}.csv",
+            output=data_dir / f"{assay_id}.csv",
             pubchem_InchI_chunksize=100,
             download_all=True
         )
 
     # Combine all the data into one file
     d4 = pd.concat([
-        pd.read_csv(f"data/{assay_id}.csv") for assay_id in d4_ids
+        pd.read_csv(data_dir / f"{assay_id}.csv") for assay_id in d4_ids
     ])
 
     d4 = (d4
@@ -248,16 +259,11 @@ def get_d4_dataset(output="data/D4R.csv"):
     )
     # Delete temporary files
     for assay_id in d4_ids:
-        os.remove(f"data/{assay_id}.csv")
+        os.remove(data_dir / f"{assay_id}.csv")
 
     d4.to_csv(output, index=False)
 
 
 if __name__ == "__main__":
-    # get_zinc_dataset()
-    # get_nrtk3_assays()
-    # get_nrtk1_assays()
-    # get_ros1_dataset()
-    # get_d4_dataset()
     get_bbb_dataset()
     get_maob_dataset()

@@ -1,5 +1,10 @@
 #%%
 import os
+from pathlib import Path
+import sys
+
+current_dir = Path(__file__).resolve().parent
+sys.path.append(str(current_dir.parent))
 
 from guacamol.assess_goal_directed_generation import assess_goal_directed_generation
 from baselines.graph_ga.goal_directed_generation import GB_GA_Generator
@@ -48,7 +53,7 @@ optimiser = ChemGEGenerator(
     generations=1000,
     n_jobs=N_JOBS,
     random_start=False,
-    patience=5
+    patience=50
 )
 
 json_file_path = os.path.join("reports", 'smiles_ga.json')
@@ -58,19 +63,19 @@ assess_goal_directed_generation(
 )
 
 #%%
-print("Generating molecules with RandomSmilesSampler")
+# print("Generating molecules with RandomSmilesSampler")
 
-with open(SMILES_HTS_FILE, 'r') as smiles_file:
-    smiles_list = smiles_file.readlines()
+# with open(SMILES_HTS_FILE, 'r') as smiles_file:
+#     smiles_list = smiles_file.readlines()
 
-sampler = RandomSmilesSampler(molecules=smiles_list)
-optimiser = RandomSamplingOptimizer(sampler=sampler)
+# sampler = RandomSmilesSampler(molecules=smiles_list)
+# optimiser = RandomSamplingOptimizer(sampler=sampler)
 
-json_file_path = os.path.join("reports", 'random_smiles.json')
+# json_file_path = os.path.join("reports", 'random_smiles.json')
 
-assess_goal_directed_generation(
-    optimiser, json_output_file=json_file_path, benchmark_version="multitarget"
-)
+# assess_goal_directed_generation(
+#     optimiser, json_output_file=json_file_path, benchmark_version="multitarget"
+# )
 
 #%%
 print("Generating molecules with BestFromChemblOptimizer")

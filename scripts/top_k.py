@@ -1,11 +1,19 @@
 from joblib import Parallel, delayed
-from guacamol.benchmark_suites import goal_directed_benchmark_suite
-from guacamol.utils.chemistry import canonicalize
 from datetime import datetime
 from tqdm import tqdm
 
+import sys
+from pathlib import Path
+
+current_dir = Path(__file__).resolve().parent
+data_dir = current_dir.parent / "guacamol" / "data"
+sys.path.append(str(current_dir.parent))
+
+from guacamol.benchmark_suites import goal_directed_benchmark_suite
+from guacamol.utils.chemistry import canonicalize
+
 pool = Parallel(n_jobs=-1, timeout=10_000)
-smi_file = 'guacamol/data/chembl24_canon_train.smiles'
+smi_file = data_dir / "chembl24_canon_train.smiles"
 batch_size = 200
 
 
@@ -39,7 +47,7 @@ if __name__ == '__main__':
 
         top_k_smiles = top_k(all_smiles, scoring_function, 50_000)
 
-        with open(f"guacamol/data/top_k/{benchmark.name}.smiles", 'w') as f:
+        with open(data_dir / "top_k" / f"{benchmark.name}.smiles", 'w') as f:
             f.write('\n'.join(top_k_smiles))
 
         print(f'[{datetime.now():%H:%M:%S}] Finished top k for {i}/{len(benchmarks)}: {benchmark.name}')
