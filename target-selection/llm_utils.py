@@ -61,7 +61,7 @@ response_schemas = [
 
 parser = StructuredOutputParser.from_response_schemas(response_schemas)
 
-conditions_list = ["Alzheimer's", "Schizophrenia", "Lung Cancer", "Parkinson", "Depression"]
+conditions_list = ["Alzheimer's", "Schizophrenia", "Parkinson"]
 conditions = ", ".join([f'"{condition}"' for condition in conditions_list])
 
 text_template= """Given the following drug indication text, please indicate if it is associated with one of the following diseases:\n

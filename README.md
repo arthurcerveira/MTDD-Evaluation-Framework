@@ -6,7 +6,7 @@ This repository contains the code and data for the paper "Evaluation Framework f
 
 ### Setup
 
-To install the required packages, run the following command:
+The code is written in Python 3.11.6. To install the required packages, run the following command:
 
 ```bash
 $ pip install -r requirements.txt
@@ -18,6 +18,10 @@ To download the required data and train the QSAR models for the brain diseases c
 $ python scripts/external_data_sources.py
 $ python scripts/qsar_pipeline.py
 ```
+
+### Target selection
+
+The target selction process is described in [`target-selection/README.md`](target-selection/README.md).
 
 ### Running the experiments
 

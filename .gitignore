@@ -1,3 +1,7 @@
+target-selection/*.xml
+target-selection/*.json
+target-selection/*.smiles
+
 venv/
 models/*.pkl
 data/*.csv

@@ -1,0 +1,2 @@
+langchain==0.1.12
+numpy==1.26.3
