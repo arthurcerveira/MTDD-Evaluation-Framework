@@ -1,12 +1,12 @@
 # Evaluation Framework for AI-driven Molecular Design of Multi-target Drugs
 
-This repository contains the code and data for the paper "Evaluation Framework for AI-driven Molecular Design of Multi-target Drugs: Brain Diseases as a Case Study".
+This repository contains the code and data for the paper "[Evaluation Framework for AI-driven Molecular Design of Multi-target Drugs: Brain Diseases as a Case Study](https://arxiv.org/abs/2408.10482)".
 
 ## Instructions
 
 ### Setup
 
-The code is written in Python 3.11.6. To install the required packages, run the following command:
+The code was written and tested in Python 3.11.6. To install the required packages, run the following command:
 
 ```bash
 $ pip install -r requirements.txt
@@ -49,4 +49,21 @@ The results of the experiments are saved in the `reports` folder. We can evaluat
 
 ```bash
 $ python scripts/lo_task_benchmark.py
+```
+
+## Citation
+
+If you find this project useful for your research, please consider citing the following BibTeX entry.
+
+```bibtex
+@INPROCEEDINGS{10611839,
+  author={Cerveira, Arthur and Kremer, Frederico and Lourenço, Darling and Corrêa, Ulisses B.},
+  booktitle={2024 IEEE Congress on Evolutionary Computation (CEC)}, 
+  title={Evaluation Framework for AI -driven Molecular Design of Multi-target Drugs: Brain Diseases as a Case Study}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={1-8},
+  keywords={Drugs;Training;Toxicology;Biological system modeling;Modulation;Evolutionary computation;Benchmark testing;molecular design;multi-target drug discovery;evolutionary algorithms;deep generative models;de novo design},
+  doi={10.1109/CEC60901.2024.10611839}}
 ```
